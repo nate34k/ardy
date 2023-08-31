@@ -11,7 +11,7 @@ where
     D: Deserializer<'de>,
 {
     let s = String::deserialize(deserializer)?;
-    NaiveDateTime::parse_from_str(&s, "%Y-%m-%dT%H:%M:%S")
+    NaiveDateTime::parse_from_str(&s, "%Y-%m-%dT%H:%M")
         .map_err(serde::de::Error::custom)
 }
 

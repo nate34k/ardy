@@ -1,7 +1,7 @@
 use rusqlite::{Connection, Result};
 
 pub fn init_db() -> Result<()> {
-    let conn = Connection::open("merchant.db")?;
+    let conn = Connection::open("db/ardy.db")?;
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS items (

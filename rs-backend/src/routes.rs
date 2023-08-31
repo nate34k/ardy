@@ -4,13 +4,13 @@ use rusqlite::{Connection, Result};
 use crate::models::{ItemData, Hello};
 
 // Handle GET request
-#[get("/api/hello")]
+#[get("/api/v1/hello")]
 pub async fn hello_get() -> impl Responder {
     HttpResponse::Ok().body("Hello, World!")
 }
 
 // Handle POST request
-#[post("/api/hello")]
+#[post("/api/v1/hello")]
 pub async fn hello_post(web::Json(hello_data): web::Json<Hello>) -> impl Responder {
     if hello_data.hello == "actix" {
         println!("Hello, actix!");
@@ -21,11 +21,10 @@ pub async fn hello_post(web::Json(hello_data): web::Json<Hello>) -> impl Respond
     }
 }
 
-// ... (rest of the code)
-
-#[post("/api/item")]
-pub async fn item_post(web::Json(item_data): web::Json<ItemData>) -> Result<impl Responder, Error> {
-    let conn = Connection::open("merchant.db").map_err(|e| {
+// Handle Post request for adding trade data to database
+#[post("/api/v1/trade")]
+pub async fn trade_post(web::Json(item_data): web::Json<ItemData>) -> Result<impl Responder, Error> {
+    let conn = Connection::open("db/ardy.db").map_err(|e| {
         println!("Failed to open database: {}", e);
         HttpResponse::InternalServerError().body("Failed to open database")
     });

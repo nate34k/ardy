@@ -3,7 +3,8 @@ mod models;
 mod db;
 
 use actix_web::{App, HttpServer};
-use routes::{hello_get, hello_post, item_post};
+use actix_cors::Cors;
+use routes::{hello_get, hello_post, trade_post};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -11,12 +12,20 @@ async fn main() -> std::io::Result<()> {
     db::init_db().expect("Failed to initialize database");
 
     HttpServer::new(|| {
+        // Enable CORS *UNSAFE FOR PRODUCTION*
+        let cors = Cors::default()
+            .allow_any_origin()
+            .allow_any_method()
+            .allow_any_header()
+            .max_age(3600);
+
         App::new()
+            .wrap(cors)
             .service(hello_get)
             .service(hello_post)
-            .service(item_post)
+            .service(trade_post)
     })
-    .bind("127.0.0.1:8080")?
+    .bind("127.0.0.1:5000")?
     .run()
     .await
 }

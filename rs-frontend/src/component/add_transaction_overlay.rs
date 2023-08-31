@@ -12,8 +12,8 @@ pub struct AddTransactionOverlay {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Trade {
     item_name: String,
-    quantity_traded: i64,
-    total_trade_value: i64,
+    quantity: i64,
+    total_price: i64,
     is_purchase: bool,
     timestamp: String,
 }
@@ -39,8 +39,8 @@ impl Component for AddTransactionOverlay {
             show_overlay: false,
             trade: Trade {
                 item_name: String::new(),
-                quantity_traded: 0,
-                total_trade_value: 0,
+                quantity: 0,
+                total_price: 0,
                 is_purchase: true,
                 timestamp: String::new(),
             },
@@ -64,18 +64,18 @@ impl Component for AddTransactionOverlay {
                 false
             }
             Msg::UpdateQuantityTraded(quantity) => {
-                self.trade.quantity_traded = quantity;
+                self.trade.quantity = quantity;
                 info!(format!(
                     "self.trade.quantity_traded: {}",
-                    &self.trade.quantity_traded
+                    &self.trade.quantity
                 ));
                 false
             }
             Msg::UpdateTotalTradeValue(value) => {
-                self.trade.total_trade_value = value;
+                self.trade.total_price = value;
                 info!(format!(
                     "self.trade.total_trade_value: {}",
-                    &self.trade.total_trade_value
+                    &self.trade.total_price
                 ));
                 false
             }
@@ -102,7 +102,9 @@ impl Component for AddTransactionOverlay {
 
                 // Send the trade to the backend
                 ctx.link().send_future(async {
-                    let resp = Request::post("http://localhost:5000/api/add_trade")
+                    info!(format!("Sending trade: {}", trade_json));
+                    let resp = Request::post("http://localhost:5000/api/v1/trade")
+                        .header("Content-Type", "application/json")
                         .body(trade_json)
                         .send()
                         .await;
