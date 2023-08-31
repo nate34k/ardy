@@ -5,7 +5,7 @@ pub fn init_db() -> Result<()> {
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS items (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY NOT NULL,
             name TEXT UNIQUE NOT NULL
         )",
         [],
@@ -13,7 +13,7 @@ pub fn init_db() -> Result<()> {
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS trades (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id INTEGER PRIMARY KEY NOT NULL,
             item_id INTEGER NOT NULL,
             quantity INTEGER NOT NULL,
             total_price INTEGER NOT NULL,

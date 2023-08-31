@@ -243,16 +243,18 @@ impl AddTransactionOverlay {
                 </div>
 
                 <div class="label-input-container">
-                    <select id="sale-or-purchase" name="sale-or-purchase" required=true
-                        onchange={ctx.link().callback(|e: Event| {
-                            let select: HtmlInputElement = e.target_unchecked_into();
-                            let sale_or_purchase = select.value();
-                            Msg::UpdateIsPurchase(sale_or_purchase == "purchase")
-                        })}
-                    >
-                        <option value="purchase" selected=true>{"Purchase"}</option>
-                        <option value="sale">{"Sale"}</option>
-                    </select>
+                    <div class="radio-button-container">
+                        <input type="radio" id="purchase" name="sale-or-purchase" value="purchase" checked={true}
+                            onclick={ctx.link().callback(|_| Msg::UpdateIsPurchase(true))}
+                        />
+                        <label for="purchase">{"Purchase"}</label>
+                    </div>
+                    <div class="radio-button-container">
+                        <input type="radio" id="sale" name="sale-or-purchase" value="sale" checked={false}
+                            onclick={ctx.link().callback(|_| Msg::UpdateIsPurchase(false))}
+                        />
+                        <label for="sale">{"Sale"}</label>
+                    </div>
                     <label for="sale-or-purchase">{"Sale or Purchase"}</label>
                 </div>
 

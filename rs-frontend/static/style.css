@@ -4,6 +4,22 @@ body {
     color: #eaeaea;
 }
 
+/* Centering the main content */
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh; /* take the full viewport height */
+    padding: 20px;
+}
+
+/* Styling for the search bar and its components for better alignment */
+div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 input, button {
     padding: 10px;
     border: none;
@@ -132,6 +148,15 @@ button:hover {
     color: #007bff;
 }
 
+.radio-button-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 50%;
+    margin: 0px;
+}
+
 .overlay-label, .overlay-input {
     width: 100%;
 }
@@ -179,18 +204,3 @@ button[type="submit"]:hover {
     background-color: #004080;
 }
 
-/* Centering the main content */
-main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100vh; /* take the full viewport height */
-    padding: 20px;
-}
-
-/* Styling for the search bar and its components for better alignment */
-div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}

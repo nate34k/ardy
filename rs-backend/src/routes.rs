@@ -30,13 +30,15 @@ pub async fn trade_post(web::Json(item_data): web::Json<ItemData>) -> Result<imp
     });
 
     // Insert item_name into items table and get its id
-    conn.as_ref().unwrap().execute(
+    let temp_num = conn.as_ref().unwrap().execute(
         "INSERT OR IGNORE INTO items (name) VALUES (?1)",
         &[&item_data.item_name],
     ).map_err(|e| {
         println!("Failed to insert item name into items table: {}", e);
         HttpResponse::InternalServerError().body("Failed to insert item name into items table")
     }).unwrap();
+
+    println!("temp_num: {}", temp_num);
 
     let item_id: i64 = conn.as_ref().unwrap().query_row(
         "SELECT id FROM items WHERE name = ?1",
