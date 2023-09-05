@@ -30,15 +30,13 @@ pub async fn trade_post(web::Json(item_data): web::Json<ItemData>) -> Result<imp
     });
 
     // Insert item_name into items table and get its id
-    let temp_num = conn.as_ref().unwrap().execute(
+    conn.as_ref().unwrap().execute(
         "INSERT OR IGNORE INTO items (name) VALUES (?1)",
         &[&item_data.item_name],
     ).map_err(|e| {
         println!("Failed to insert item name into items table: {}", e);
         HttpResponse::InternalServerError().body("Failed to insert item name into items table")
     }).unwrap();
-
-    println!("temp_num: {}", temp_num);
 
     let item_id: i64 = conn.as_ref().unwrap().query_row(
         "SELECT id FROM items WHERE name = ?1",
@@ -64,4 +62,51 @@ pub async fn trade_post(web::Json(item_data): web::Json<ItemData>) -> Result<imp
     }).unwrap();
 
     Ok(HttpResponse::Ok().body("Trade data successfully saved"))
+}
+
+// Handle GET request for getting trade data from database
+#[get("/api/v1/trade")]
+pub async fn trade_get() -> Result<impl Responder, Error> {
+    println!("GET request received");
+
+    let conn = Connection::open("db/ardy.db").map_err(|e| {
+        println!("Failed to open database: {}", e);
+        HttpResponse::InternalServerError().body("Failed to open database")
+    });
+
+    let mut stmt = conn.as_ref().unwrap().prepare(
+        "SELECT items.name, trades.quantity, trades.total_price, trades.is_purchase, trades.timestamp FROM trades INNER JOIN items ON trades.item_id = items.id",
+    ).map_err(|e| {
+        println!("Failed to prepare statement: {}", e);
+        HttpResponse::InternalServerError().body("Failed to prepare statement")
+    }).unwrap();
+
+    let rows = stmt.query_map(
+        [],
+        |row| {
+            Ok(ItemData {
+                item_name: row.get(0)?,
+                quantity: row.get(1)?,
+                total_price: row.get(2)?,
+                is_purchase: row.get(3)?,
+                timestamp: {
+                    let timestamp: String = row.get(4)?;
+                    let timestamp: i64 = timestamp.parse().unwrap();
+                    let naive_datetime = chrono::NaiveDateTime::from_timestamp_opt(timestamp, 0).unwrap();
+                    naive_datetime
+                },
+            })
+        },
+    ).map_err(|e| {
+        println!("Failed to query map: {}", e);
+        HttpResponse::InternalServerError().body("Failed to query map")
+    }).unwrap();
+
+    let mut item_data_vec = Vec::new();
+
+    for row in rows {
+        item_data_vec.push(row.unwrap());
+    }
+
+    Ok(HttpResponse::Ok().json(item_data_vec))
 }

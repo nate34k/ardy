@@ -1,5 +1,5 @@
 use chrono::NaiveDateTime;
-use serde::{Deserialize, Deserializer};
+use serde::{Deserialize, Deserializer, Serialize};
 
 #[derive(Deserialize)]
 pub struct Hello {
@@ -15,12 +15,21 @@ where
         .map_err(serde::de::Error::custom)
 }
 
-#[derive(Deserialize)]
+fn serialize_datetime<S>(datetime: &NaiveDateTime, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: serde::Serializer,
+{
+    let s = format!("{}", datetime.format("%Y-%m-%dT%H:%M"));
+    serializer.serialize_str(&s)
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct ItemData {
     pub item_name: String,
     pub quantity: i64,
     pub total_price: i64,
     pub is_purchase: bool,
     #[serde(deserialize_with = "deserialize_datetime")]
+    #[serde(serialize_with = "serialize_datetime")]
     pub timestamp: NaiveDateTime,
 }

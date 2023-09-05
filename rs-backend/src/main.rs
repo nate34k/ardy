@@ -4,7 +4,7 @@ mod db;
 
 use actix_web::{App, HttpServer};
 use actix_cors::Cors;
-use routes::{hello_get, hello_post, trade_post};
+use routes::{hello_get, hello_post, trade_post, trade_get};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -24,6 +24,7 @@ async fn main() -> std::io::Result<()> {
             .service(hello_get)
             .service(hello_post)
             .service(trade_post)
+            .service(trade_get)
     })
     .bind("127.0.0.1:5000")?
     .run()

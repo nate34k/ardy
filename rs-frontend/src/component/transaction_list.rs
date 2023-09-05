@@ -1,3 +1,5 @@
+use gloo::console::info;
+use reqwasm::http::Request;
 use serde::{Serialize, Deserialize};
 use yew::prelude::*;
 
@@ -7,42 +9,50 @@ pub struct TransactionList {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Transaction {
-    pub id: i32,
-    pub name: String,
+    pub item_name: String,
     pub quantity: i64,
-    pub price: i64,
-    pub sale_or_purchase: String,
-    pub date: String,
+    pub total_price: i64,
+    pub is_purchase: bool,
+    pub timestamp: String,
+}
+
+pub enum Msg {
+    GetTransactionsComplete(Vec<Transaction>),
 }
 
 impl Component for TransactionList {
-    type Message = ();
+    type Message = Msg;
     type Properties = ();
 
-    fn create(_ctx: &Context<Self>) -> Self {
-        Self {
-            transactions: vec![
-                Transaction {
-                    id: 1,
-                    name: "Noxious Scythe".to_string(),
-                    quantity: 1,
-                    price: 300_000_000,
-                    sale_or_purchase: "Sale".to_string(),
-                    date: "2021-01-01".to_string(),
+    fn create(ctx: &Context<Self>) -> Self {
+        ctx.link().send_future(async {
+            let resp = Request::get("http://localhost:5000/api/v1/trade")
+                .send()
+                .await;
+
+            match resp {
+                Ok(resp) => {
+                    let transactions = resp.json::<Vec<Transaction>>().await.unwrap();
+                    Msg::GetTransactionsComplete(transactions)
                 },
-                Transaction {
-                    id: 2,
-                    name: "Noxious Scythe".to_string(),
-                    quantity: 1,
-                    price: 320_000_000,
-                    sale_or_purchase: "Purchase".to_string(),
-                    date: "2021-01-01".to_string(),
+                Err(_) => {
+                    Msg::GetTransactionsComplete(Vec::new())
                 },
-            ],
-        }
+            }
+        });
+
+        Self { transactions: Vec::new() }
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        match msg {
+            Msg::GetTransactionsComplete(transactions) => {
+                info!(format!("Got transactions: {:?}", transactions));
+                self.transactions = transactions;
+                true
+            },
+        };
+
         true
     }
 
@@ -86,12 +96,12 @@ impl TransactionList {
     
         html! {
             <tr>
-                <td style={ last_row_style_left }>{ transaction.id }</td>
-                <td>{ &transaction.name }</td>
+                <td style={ last_row_style_left }>{ "1" }</td>
+                <td>{ &transaction.item_name }</td>
                 <td>{ transaction.quantity }</td>
-                <td>{ transaction.price }</td>
-                <td>{ &transaction.sale_or_purchase }</td>
-                <td style={ last_row_style_right }>{ &transaction.date }</td>
+                <td>{ transaction.total_price }</td>
+                <td>{ &transaction.is_purchase }</td>
+                <td style={ last_row_style_right }>{ &transaction.timestamp }</td>
             </tr>
         }
     }
