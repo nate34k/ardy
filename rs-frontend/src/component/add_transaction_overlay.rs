@@ -5,8 +5,13 @@ use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
 pub struct AddTransactionOverlay {
-    show_overlay: bool,
+    state: State,
     trade: Trade,
+}
+
+struct State {
+    show_overlay: bool,
+    is_purchase_radio_button_checked: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -36,7 +41,10 @@ impl Component for AddTransactionOverlay {
 
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
-            show_overlay: false,
+            state: State {
+                show_overlay: false,
+                is_purchase_radio_button_checked: true,
+            },
             trade: Trade {
                 item_name: String::new(),
                 quantity: 0,
@@ -52,9 +60,9 @@ impl Component for AddTransactionOverlay {
         match msg {
             // Toggle the overlay and return true to re-render the component
             Msg::ToggleOverlay => {
-                self.show_overlay = !self.show_overlay;
+                self.state.show_overlay = !self.state.show_overlay;
                 // Log the value of self.show_overlay
-                info!(format!("self.show_overlay: {}", &self.show_overlay));
+                info!(format!("self.show_overlay: {}", &self.state.show_overlay));
                 true
             }
             // Update the trade struct and return false to prevent re-rendering the component
@@ -81,6 +89,7 @@ impl Component for AddTransactionOverlay {
             }
             Msg::UpdateIsPurchase(is_purchase) => {
                 self.trade.is_purchase = is_purchase;
+                self.state.is_purchase_radio_button_checked = is_purchase;
                 info!(format!(
                     "self.trade.is_purchase: {}",
                     &self.trade.is_purchase
@@ -157,7 +166,7 @@ impl AddTransactionOverlay {
     }
 
     fn construct_overlay_html(&self, ctx: &Context<Self>) -> Html {
-        if self.show_overlay {
+        if self.state.show_overlay {
             html! {
                 <div class="overlay-container">
                     <div class="overlay"> {
@@ -244,13 +253,13 @@ impl AddTransactionOverlay {
 
                 <div class="label-input-container">
                     <div class="radio-button-container">
-                        <input type="radio" id="purchase" name="sale-or-purchase" value="purchase" checked={true}
+                        <input type="radio" id="purchase" name="sale-or-purchase" value="purchase" checked={self.state.is_purchase_radio_button_checked}
                             onclick={ctx.link().callback(|_| Msg::UpdateIsPurchase(true))}
                         />
                         <label for="purchase">{"Purchase"}</label>
                     </div>
                     <div class="radio-button-container">
-                        <input type="radio" id="sale" name="sale-or-purchase" value="sale" checked={false}
+                        <input type="radio" id="sale" name="sale-or-purchase" value="sale" checked={!self.state.is_purchase_radio_button_checked}
                             onclick={ctx.link().callback(|_| Msg::UpdateIsPurchase(false))}
                         />
                         <label for="sale">{"Sale"}</label>
