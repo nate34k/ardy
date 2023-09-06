@@ -64,18 +64,30 @@ pub async fn trade_post(web::Json(item_data): web::Json<ItemData>) -> Result<imp
     Ok(HttpResponse::Ok().body("Trade data successfully saved"))
 }
 
+#[derive(serde::Deserialize)]
+pub struct QueryParams {
+    item_name: Option<String>,
+}
+
 // Handle GET request for getting trade data from database
+// Takes optional query parameters: item_name
 #[get("/api/v1/trade")]
-pub async fn trade_get() -> Result<impl Responder, Error> {
+pub async fn trade_get(query_params: web::Query<QueryParams>) -> Result<impl Responder, Error> {
     println!("GET request received");
+
 
     let conn = Connection::open("db/ardy.db").map_err(|e| {
         println!("Failed to open database: {}", e);
         HttpResponse::InternalServerError().body("Failed to open database")
     });
 
+    let sql_query = match &query_params.item_name {
+        Some(item_name) => format!("SELECT items.name, trades.quantity, trades.total_price, trades.is_purchase, trades.timestamp FROM trades INNER JOIN items ON trades.item_id = items.id WHERE items.name = '{}'", item_name),
+        None => "SELECT items.name, trades.quantity, trades.total_price, trades.is_purchase, trades.timestamp FROM trades INNER JOIN items ON trades.item_id = items.id".to_string(),
+    };
+
     let mut stmt = conn.as_ref().unwrap().prepare(
-        "SELECT items.name, trades.quantity, trades.total_price, trades.is_purchase, trades.timestamp FROM trades INNER JOIN items ON trades.item_id = items.id",
+        &sql_query,
     ).map_err(|e| {
         println!("Failed to prepare statement: {}", e);
         HttpResponse::InternalServerError().body("Failed to prepare statement")

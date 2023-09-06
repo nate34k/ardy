@@ -1,10 +1,12 @@
 use gloo::console::info;
 use reqwasm::http::Request;
 use serde::{Serialize, Deserialize};
+use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
 pub struct TransactionList {
     transactions: Vec<Transaction>,
+    item_name: String,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -17,6 +19,8 @@ pub struct Transaction {
 }
 
 pub enum Msg {
+    UpdateItemName(String),
+    Search,
     GetTransactionsComplete(Vec<Transaction>),
 }
 
@@ -41,11 +45,42 @@ impl Component for TransactionList {
             }
         });
 
-        Self { transactions: Vec::new() }
+        Self { 
+            transactions: Vec::new(),
+            item_name: String::new(),
+        }
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
+            Msg::UpdateItemName(name) => {
+                self.item_name = name;
+                false
+            },
+            Msg::Search => {
+                let item_name = self.item_name.clone();
+                // Send request to backend
+                ctx.link().send_future(async move {
+                    let mut url = String::from("http://localhost:5000/api/v1/trade");
+                    if !item_name.is_empty() {
+                        url.push_str(&format!("?item_name={}", item_name));
+                    }
+                    let resp = Request::get(&url)
+                        .send()
+                        .await;
+
+                    match resp {
+                        Ok(resp) => {
+                            let transactions = resp.json::<Vec<Transaction>>().await.unwrap();
+                            Msg::GetTransactionsComplete(transactions)
+                        },
+                        Err(_) => {
+                            Msg::GetTransactionsComplete(Vec::new())
+                        },
+                    }
+                });
+                true
+            },
             Msg::GetTransactionsComplete(transactions) => {
                 info!(format!("Got transactions: {:?}", transactions));
                 self.transactions = transactions;
@@ -56,26 +91,44 @@ impl Component for TransactionList {
         true
     }
 
-    fn view(&self, _ctx: &Context<Self>) -> Html {
+    fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
-            <div>
-                <h1>{ "Transactions" }</h1>
-                <table class="transaction-list-table">
-                    <thead>
-                        <tr>
-                            <th style="border-top-left-radius:10px">{ "ID" }</th>
-                            <th>{ "Name" }</th>
-                            <th>{ "Quantity" }</th>
-                            <th>{ "Price" }</th>
-                            <th>{ "Sale or Purchase" }</th>
-                            <th style="border-top-right-radius:10px">{ "Date" }</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        { for self.transactions.iter().enumerate().map(|(index, transaction)| self.render_row(index, transaction)) }
-                    </tbody>
-                </table>
-            </div>
+            <>
+                <div class="search-bar">
+                    <input
+                        type="text"
+                        placeholder="Enter item name"
+                        value={self.item_name.clone()}
+                        oninput = {
+                            ctx.link().callback(|e: InputEvent| {
+                                let input: HtmlInputElement = e.target_unchecked_into();
+                                Msg::UpdateItemName(input.value())
+                            })
+                        }
+                    />
+                    <button onclick={ctx.link().callback(|_| Msg::Search)}>
+                        {"Search"}
+                    </button>
+                </div>
+                <div>
+                    <h1>{ "Transactions" }</h1>
+                    <table class="transaction-list-table">
+                        <thead>
+                            <tr>
+                                <th style="border-top-left-radius:10px">{ "ID" }</th>
+                                <th>{ "Name" }</th>
+                                <th>{ "Quantity" }</th>
+                                <th>{ "Price" }</th>
+                                <th>{ "Sale or Purchase" }</th>
+                                <th style="border-top-right-radius:10px">{ "Date" }</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            { for self.transactions.iter().enumerate().map(|(index, transaction)| self.render_row(index, transaction)) }
+                        </tbody>
+                    </table>
+                </div>
+            </>
         }
     }
 }

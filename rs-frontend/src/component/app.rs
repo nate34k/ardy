@@ -18,7 +18,6 @@ impl Component for App {
     fn view(&self, _ctx: &Context<Self>) -> Html {
         html! {
             <main>
-                <search_bar::SearchBar />
                 <transaction_list::TransactionList />
                 <add_transaction_overlay::AddTransactionOverlay />
             </main>
