@@ -2,6 +2,7 @@ body {
     font-family: Arial, sans-serif;
     background-color: #1a1a1a;
     color: #eaeaea;
+    margin: 0;
 }
 
 /* Centering the main content */
@@ -10,14 +11,17 @@ main {
     flex-direction: column;
     align-items: center;
     height: 100vh; /* take the full viewport height */
-    padding: 20px;
 }
 
-/* Styling for the search bar and its components for better alignment */
 div {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+/* Styling for the search bar and its components for better alignment */
+.search-bar {
+    margin-top: 15px;
 }
 
 input, button {
@@ -37,9 +41,10 @@ button {
 }
 
 #add-transaction-button {
-    position: absolute;
-    top: 27px;
-    right: 27px;
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    margin: 20px;
 }
 
 button:hover {
@@ -106,7 +111,7 @@ button:hover {
 }
 
 .label-input-container label {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
     font-size: 16px;
     font-weight: 600;
     text-transform: uppercase;
@@ -117,21 +122,23 @@ button:hover {
 
 /* Default styles */
 .label-input-container input {
-    border: 1px solid #ccc;
-    background-color: #f9f9f9;
-    color: #333;
+    border: 2px solid #ccc;
+    background-color: #5c5c5c;
+    color: #d4d4d4;
+    transition: border-color 0.3s ease;
 }
 
 /* Styles when focused */
 .label-input-container input:focus {
-    background-color: #e6f7ff;
-    color: #333;
+    border-color: #007bff;
+    background-color: #6c787e;
+    color: #d4d4d4;
     outline: none;
 }
 
 /* If you also want to style the dropdown */
 .label-input-container select {
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
     background-color: #f9f9f9;
     color: #333;
 }
@@ -224,3 +231,72 @@ button[type="submit"]:hover {
     text-align: center;
     padding: 15px;
 }
+
+.alert-card {
+    background-color: #333;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 300px;
+    height: 100px;
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    color: white;
+    font-family: 'Roboto', sans-serif;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    animation: scale-in-center 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) forwards,
+               scale-out-center 0.5s cubic-bezier(0.550, 0.085, 0.680, 0.530) forwards 4.75s;
+}
+
+.alert-card .bar {
+    width: 10px;
+    height: 100%;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    background-color: rgb(31, 119, 31);
+}
+
+.alert-card .content {
+    margin-left: 0px;
+}
+
+.alert-card .material-icons {
+    font-size: 24px;
+    color: rgb(31, 119, 31);
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+.alert-card h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.alert-card p {
+    margin: 0;
+    margin-bottom: 4px;
+    color: #aaa;
+}
+  
+@keyframes scale-in-center {
+    0% {
+      transform: scale(0);
+    }
+    100% {
+      transform: scale(1);
+    }
+}
+  
+@keyframes scale-out-center {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(0);
+    }
+}
+  
+  

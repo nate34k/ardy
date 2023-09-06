@@ -12,6 +12,13 @@ pub struct AddTransactionOverlay {
 struct State {
     show_overlay: bool,
     is_purchase_radio_button_checked: bool,
+    submit_status: SubmitStatus,
+}
+
+enum SubmitStatus {
+    Success,
+    Failure,
+    None,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -44,6 +51,7 @@ impl Component for AddTransactionOverlay {
             state: State {
                 show_overlay: false,
                 is_purchase_radio_button_checked: true,
+                submit_status: SubmitStatus::None,
             },
             trade: Trade {
                 item_name: String::new(),
@@ -63,6 +71,10 @@ impl Component for AddTransactionOverlay {
                 self.state.show_overlay = !self.state.show_overlay;
                 // Log the value of self.show_overlay
                 info!(format!("self.show_overlay: {}", &self.state.show_overlay));
+
+                // Set submit_status to None
+                self.state.submit_status = SubmitStatus::None;
+            
                 true
             }
             // Update the trade struct and return false to prevent re-rendering the component
@@ -106,6 +118,8 @@ impl Component for AddTransactionOverlay {
                 // Prevent the default behavior of the event (i.e. prevent the form from submitting)
                 event.prevent_default();
 
+                self.state.submit_status = SubmitStatus::None;
+
                 // Convert trade struct to JSON
                 let trade_json = serde_json::to_string(&self.trade).unwrap();
 
@@ -136,10 +150,12 @@ impl Component for AddTransactionOverlay {
             }
             Msg::SubmitTradeSuccess => {
                 info!("Trade submitted successfully");
+                self.state.submit_status = SubmitStatus::Success;
                 true
             }
             Msg::SubmitTradeFailure => {
                 info!("Trade submission failed");
+                self.state.submit_status = SubmitStatus::Failure;
                 true
             }
         };
@@ -173,6 +189,9 @@ impl AddTransactionOverlay {
                         self.construct_overlay_header_html(&ctx)
                     } {
                         self.construct_overlay_body_html(&ctx)
+                    } 
+                    if let SubmitStatus::Success = self.state.submit_status {
+                        { self.construct_success_fail_msg_html(&ctx) }
                     }
                     </div>
                 </div>
@@ -199,6 +218,20 @@ impl AddTransactionOverlay {
             }
             </div>
         }
+    }
+
+    fn construct_success_fail_msg_html(&self, _ctx: &Context<Self>) -> Html {
+        html! {
+            <div class="alert-card">
+                <div class="bar"></div>
+                <span class="material-icons">{"check_circle"}</span>
+                <div class="content">
+                    <h1>{"Success"}</h1>
+                    <p>{"Trade submitted successfully"}</p>
+                </div>
+            </div>
+        }
+           
     }
 
     fn construct_form_html(&self, ctx: &Context<Self>) -> Html {

@@ -31,7 +31,7 @@ impl Component for SearchBar {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
-            <div>
+            <div class="search-bar">
                 <input
                     type="text"
                     placeholder="Enter item name"
