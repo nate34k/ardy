@@ -19,6 +19,7 @@ impl Component for App {
         html! {
             <main>
                 <transaction_list::TransactionList />
+                <profit_loss::ProfitLoss />
                 <add_transaction_overlay::AddTransactionOverlay />
             </main>
         }

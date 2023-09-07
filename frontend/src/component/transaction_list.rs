@@ -153,7 +153,13 @@ impl TransactionList {
                 <td>{ &transaction.item_name }</td>
                 <td>{ transaction.quantity }</td>
                 <td>{ transaction.total_price }</td>
-                <td>{ &transaction.is_purchase }</td>
+                <td> {
+                    if transaction.is_purchase {
+                        "Purchase"
+                    } else {
+                        "Sale"
+                    }
+                }</td>
                 <td style={ last_row_style_right }>{ &transaction.timestamp }</td>
             </tr>
         }

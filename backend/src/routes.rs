@@ -75,7 +75,6 @@ pub struct QueryParams {
 pub async fn trade_get(query_params: web::Query<QueryParams>) -> Result<impl Responder, Error> {
     println!("GET request received");
 
-
     let conn = Connection::open("db/ardy.db").map_err(|e| {
         println!("Failed to open database: {}", e);
         HttpResponse::InternalServerError().body("Failed to open database")
@@ -121,4 +120,50 @@ pub async fn trade_get(query_params: web::Query<QueryParams>) -> Result<impl Res
     }
 
     Ok(HttpResponse::Ok().json(item_data_vec))
+}
+
+struct ProfitLossData {
+    profit_loss: i64,
+}
+
+// Handle GET request for profit/loss calculation
+#[get("/api/v1/profit_loss")]
+pub async fn profit_loss_get() -> Result<impl Responder, Error> {
+    // Open database conn
+    let conn = Connection::open("db/ardy.db").map_err(|e| {
+        println!("Failed to open database: {}", e);
+        HttpResponse::InternalServerError().body("Failed to open database")
+    });
+
+    // Get a list of all prices for each trade (quantity * total_price)
+    // If is_purchase is 0, multiply by -1 to get the correct sign
+    let mut stmt = conn.as_ref().unwrap().prepare(
+        "SELECT trades.quantity * trades.total_price * (CASE WHEN trades.is_purchase = 0 THEN 1 ELSE -1 END) FROM trades",
+    ).map_err(|e| {
+        println!("Failed to prepare statement: {}", e);
+        HttpResponse::InternalServerError().body("Failed to prepare statement")
+    }).unwrap();
+
+    let rows = stmt.query_map(
+        [],
+        |row| {
+            Ok(
+                ProfitLossData {
+                    profit_loss: row.get(0)?,
+                }
+            )
+        },
+    ).map_err(|e| {
+        println!("Failed to query map: {}", e);
+        HttpResponse::InternalServerError().body("Failed to query map")
+    }).unwrap();
+
+    let mut profit_loss_vec = Vec::new();
+
+    for row in rows {
+        profit_loss_vec.push(row.unwrap().profit_loss);
+    }
+
+    // Return Sum of all prices
+    Ok(HttpResponse::Ok().json(profit_loss_vec.iter().sum::<i64>()))
 }
