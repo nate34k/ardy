@@ -1,7 +1,7 @@
-rs-frontend/dist
-rs-frontend/target
-rs-frontend/Cargo.lock
-rs-backend/db
-rs-backend/target
-rs-backend/Cargo.lock
+frontend/dist
+frontend/target
+frontend/Cargo.lock
+backend/db
+backend/target
+backend/Cargo.lock
 .vscode
