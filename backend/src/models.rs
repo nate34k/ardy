@@ -23,8 +23,9 @@ where
     serializer.serialize_str(&s)
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ItemData {
+    pub id: i64,
     pub item_name: String,
     pub quantity: i64,
     pub total_price: i64,

@@ -1,7 +1,14 @@
+use std::time::Duration;
+
 use reqwasm::http::Request;
-use yew::prelude::*;
+use yew::{prelude::*, platform::time::sleep};
 
 pub struct ProfitLoss {
+    state: State,
+}
+
+pub struct State {
+    component_ready: bool,
     profit_loss: i64,
 }
 
@@ -32,25 +39,36 @@ impl Component for ProfitLoss {
         });
 
         Self {
-            profit_loss: 0,
+            state: State {
+                component_ready: false,
+                profit_loss: 0,
+            },
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::GetProfitLossComplete(profit_loss) => {
-                self.profit_loss = profit_loss;
-                false
+                self.state.profit_loss = profit_loss;
+                self.state.component_ready = true;
+                true
             },
-        };
-        true
+        }
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
-        html! {
-            <div class="profit-loss">
-                <h1>{ self.profit_loss }</h1>
-            </div>
+        if self.state.component_ready {
+            html! {
+                <div class="profit-loss">
+                    <h1>{ self.state.profit_loss }</h1>
+                </div>
+            }
+        } else {
+            html! {
+                <div class="profit-loss">
+                    <h1>{ "Loading..." }</h1>
+                </div>
+            }
         }
     }
 }

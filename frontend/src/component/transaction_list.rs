@@ -11,6 +11,7 @@ pub struct TransactionList {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Transaction {
+    pub id: i64,
     pub item_name: String,
     pub quantity: i64,
     pub total_price: i64,
@@ -22,6 +23,7 @@ pub enum Msg {
     UpdateItemName(String),
     Search,
     GetTransactionsComplete(Vec<Transaction>),
+    DeleteTransaction(i64),
 }
 
 impl Component for TransactionList {
@@ -86,6 +88,25 @@ impl Component for TransactionList {
                 self.transactions = transactions;
                 true
             },
+            Msg::DeleteTransaction(id) => {
+                // Send DELETE request to backend
+                ctx.link().send_future(async move {
+                    let url = format!("http://localhost:5000/api/v1/trade?id={}", id);
+                    let resp = Request::delete(&url)
+                        .send()
+                        .await;
+
+                    match resp {
+                        Ok(_) => {
+                            Msg::Search
+                        },
+                        Err(_) => {
+                            Msg::Search
+                        },
+                    }
+                });
+                true
+            },
         };
 
         true
@@ -124,7 +145,7 @@ impl Component for TransactionList {
                             </tr>
                         </thead>
                         <tbody>
-                            { for self.transactions.iter().enumerate().map(|(index, transaction)| self.render_row(index, transaction)) }
+                            { for self.transactions.iter().enumerate().map(|(index, transaction)| self.render_row(ctx, index, transaction)) }
                         </tbody>
                     </table>
                 </div>
@@ -134,7 +155,7 @@ impl Component for TransactionList {
 }
 
 impl TransactionList {
-    fn render_row(&self, index: usize, transaction: &Transaction) -> Html {
+    fn render_row(&self, ctx: &Context<Self>, index: usize, transaction: &Transaction) -> Html {
         let last_row_style_left = if index == self.transactions.len() - 1 {
             "border-bottom-left-radius:10px"
         } else {
@@ -146,10 +167,24 @@ impl TransactionList {
         } else {
             ""
         };
+
+        let id = transaction.id.clone();
     
         html! {
             <tr>
-                <td style={ last_row_style_left }>{ "1" }</td>
+                <td style={ last_row_style_left }> { 
+                    //Button for sending DELETE request to backend
+
+                    html! {
+                        <>
+                            <button class="material-icons" onclick={ctx.link().callback(move |_| Msg::DeleteTransaction(id))}> {
+                                "delete"
+                            }
+                            </button>
+                            <span>{ &transaction.id }</span>
+                        </>
+                    }
+                }</td>
                 <td>{ &transaction.item_name }</td>
                 <td>{ transaction.quantity }</td>
                 <td>{ transaction.total_price }</td>

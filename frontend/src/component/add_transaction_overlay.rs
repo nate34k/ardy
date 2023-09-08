@@ -23,6 +23,7 @@ enum SubmitStatus {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Trade {
+    id: i64,
     item_name: String,
     quantity: i64,
     total_price: i64,
@@ -54,6 +55,7 @@ impl Component for AddTransactionOverlay {
                 submit_status: SubmitStatus::None,
             },
             trade: Trade {
+                id: 0,
                 item_name: String::new(),
                 quantity: 0,
                 total_price: 0,
@@ -281,23 +283,23 @@ impl AddTransactionOverlay {
                             Msg::UpdateTotalTradeValue(input.value().parse::<i64>().unwrap())
                         })}
                     />
-                    <label for="total-trade-value">{"Total Trade Value"}</label>
+                    <label for="total-trade-value">{"Price Per Item"}</label>
                 </div>
 
                 <div class="label-input-container">
-                    <div class="radio-button-container">
-                        <input type="radio" id="purchase" name="sale-or-purchase" value="purchase" checked={self.state.is_purchase_radio_button_checked}
-                            onclick={ctx.link().callback(|_| Msg::UpdateIsPurchase(true))}
-                        />
-                        <label for="purchase">{"Purchase"}</label>
-                    </div>
                     <div class="radio-button-container">
                         <input type="radio" id="sale" name="sale-or-purchase" value="sale" checked={!self.state.is_purchase_radio_button_checked}
                             onclick={ctx.link().callback(|_| Msg::UpdateIsPurchase(false))}
                         />
                         <label for="sale">{"Sale"}</label>
                     </div>
-                    <label for="sale-or-purchase">{"Sale or Purchase"}</label>
+                    <div class="radio-button-container">
+                        <input type="radio" id="purchase" name="sale-or-purchase" value="purchase" checked={self.state.is_purchase_radio_button_checked}
+                            onclick={ctx.link().callback(|_| Msg::UpdateIsPurchase(true))}
+                        />
+                        <label for="purchase">{"Purchase"}</label>
+                    </div>
+                    <label for="sale-or-purchase">{"Type"}</label>
                 </div>
 
                 <div class="label-input-container">

@@ -1,4 +1,4 @@
-use actix_web::{post, get, web, HttpResponse, Responder, Error};
+use actix_web::{post, get, web, HttpResponse, Responder, Error, delete};
 use rusqlite::{Connection, Result};
 
 use crate::models::{ItemData, Hello};
@@ -24,6 +24,8 @@ pub async fn hello_post(web::Json(hello_data): web::Json<Hello>) -> impl Respond
 // Handle Post request for adding trade data to database
 #[post("/api/v1/trade")]
 pub async fn trade_post(web::Json(item_data): web::Json<ItemData>) -> Result<impl Responder, Error> {
+    println!("POST request received");
+
     let conn = Connection::open("db/ardy.db").map_err(|e| {
         println!("Failed to open database: {}", e);
         HttpResponse::InternalServerError().body("Failed to open database")
@@ -51,6 +53,8 @@ pub async fn trade_post(web::Json(item_data): web::Json<ItemData>) -> Result<imp
     let is_purchase_i64 = if item_data.is_purchase { 1 } else { 0 };
 
     let naive_datetime = &item_data.timestamp.timestamp();
+
+    println!("item_data: {:?}", item_data);
 
     // Insert the trade data into trades table
     conn.unwrap().execute(
@@ -80,9 +84,10 @@ pub async fn trade_get(query_params: web::Query<QueryParams>) -> Result<impl Res
         HttpResponse::InternalServerError().body("Failed to open database")
     });
 
-    let sql_query = match &query_params.item_name {
-        Some(item_name) => format!("SELECT items.name, trades.quantity, trades.total_price, trades.is_purchase, trades.timestamp FROM trades INNER JOIN items ON trades.item_id = items.id WHERE items.name = '{}'", item_name),
-        None => "SELECT items.name, trades.quantity, trades.total_price, trades.is_purchase, trades.timestamp FROM trades INNER JOIN items ON trades.item_id = items.id".to_string(),
+    let sql_query = if query_params.item_name.is_some() {
+        format!("SELECT trades.id, items.name, trades.quantity, trades.total_price, trades.is_purchase, trades.timestamp FROM trades INNER JOIN items ON trades.item_id = items.id WHERE items.name = '{}'", query_params.item_name.as_ref().unwrap())
+    } else {
+        "SELECT trades.id, items.name, trades.quantity, trades.total_price, trades.is_purchase, trades.timestamp FROM trades INNER JOIN items ON trades.item_id = items.id".to_string()
     };
 
     let mut stmt = conn.as_ref().unwrap().prepare(
@@ -96,12 +101,13 @@ pub async fn trade_get(query_params: web::Query<QueryParams>) -> Result<impl Res
         [],
         |row| {
             Ok(ItemData {
-                item_name: row.get(0)?,
-                quantity: row.get(1)?,
-                total_price: row.get(2)?,
-                is_purchase: row.get(3)?,
+                id: row.get(0)?,
+                item_name: row.get(1)?,
+                quantity: row.get(2)?,
+                total_price: row.get(3)?,
+                is_purchase: row.get(4)?,
                 timestamp: {
-                    let timestamp: String = row.get(4)?;
+                    let timestamp: String = row.get(5)?;
                     let timestamp: i64 = timestamp.parse().unwrap();
                     let naive_datetime = chrono::NaiveDateTime::from_timestamp_opt(timestamp, 0).unwrap();
                     naive_datetime
@@ -120,6 +126,32 @@ pub async fn trade_get(query_params: web::Query<QueryParams>) -> Result<impl Res
     }
 
     Ok(HttpResponse::Ok().json(item_data_vec))
+}
+
+// Handle DELETE request for deleting trade data from database
+#[derive(serde::Deserialize)]
+pub struct DeleteQueryParams {
+    id: i64,
+}
+
+#[delete("/api/v1/trade")]
+pub async fn trade_delete(query_params: web::Query<DeleteQueryParams>) -> Result<impl Responder, Error> {
+    println!("DELETE request received");
+
+    let conn = Connection::open("db/ardy.db").map_err(|e| {
+        println!("Failed to open database: {}", e);
+        HttpResponse::InternalServerError().body("Failed to open database")
+    });
+
+    conn.unwrap().execute(
+        "DELETE FROM trades WHERE id = ?1",
+        &[&query_params.id],
+    ).map_err(|e| {
+        println!("Failed to delete trade data from trades table: {}", e);
+        HttpResponse::InternalServerError().body("Failed to delete trade data from trades table")
+    }).unwrap();
+
+    Ok(HttpResponse::Ok().body("Trade data successfully deleted"))
 }
 
 struct ProfitLossData {
