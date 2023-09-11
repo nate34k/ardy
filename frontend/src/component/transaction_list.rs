@@ -26,9 +26,14 @@ pub enum Msg {
     DeleteTransaction(i64),
 }
 
+#[derive(PartialEq, Properties, Clone)]
+pub struct Props {
+    pub update: Callback<bool>,
+}
+
 impl Component for TransactionList {
     type Message = Msg;
-    type Properties = ();
+    type Properties = Props;
 
     fn create(ctx: &Context<Self>) -> Self {
         ctx.link().send_future(async {
@@ -86,6 +91,8 @@ impl Component for TransactionList {
             Msg::GetTransactionsComplete(transactions) => {
                 info!(format!("Got transactions: {:?}", transactions));
                 self.transactions = transactions;
+                // Send callback to profit_loss component to update profit_loss
+                ctx.props().update.emit(true);
                 true
             },
             Msg::DeleteTransaction(id) => {
@@ -105,6 +112,7 @@ impl Component for TransactionList {
                         },
                     }
                 });
+                
                 true
             },
         };
