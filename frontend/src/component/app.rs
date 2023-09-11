@@ -1,6 +1,6 @@
 use crate::component::*;
 use gloo::console::log;
-use yew::prelude::*;
+use yew::{prelude::*, platform::time::sleep};
 
 pub struct App {
     should_update_profit_loss: bool,
@@ -8,6 +8,7 @@ pub struct App {
 
 pub enum Msg {
     UpdateProfitLoss(bool),
+    ResetUpdateProfitLoss,
 }
 
 impl Component for App {
@@ -16,20 +17,34 @@ impl Component for App {
 
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
-            should_update_profit_loss: false,
+            should_update_profit_loss: true,
         }
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::UpdateProfitLoss(should_update) => {
+                log!(format!("update: {}", should_update));
+
                 // Update profit loss
-                if should_update {
-                    log!("Updating profit loss");
-                    self.should_update_profit_loss = !self.should_update_profit_loss;
-                } else {
-                    log!("Not updating profit loss");
-                }
+                self.should_update_profit_loss = should_update;
+
+                log!(format!("should_update_profit_loss: {}", self.should_update_profit_loss));
+
+                // Reset update after 1 second
+                ctx.link().send_future(async {
+                    let duration = std::time::Duration::from_secs(1);
+                    sleep(duration).await;
+                    Msg::ResetUpdateProfitLoss
+                });
+
+                true
+            },
+            Msg::ResetUpdateProfitLoss => {
+                self.should_update_profit_loss = false;
+
+                log!(format!("should_update_profit_loss: {}", self.should_update_profit_loss));
+
                 true
             },
         }

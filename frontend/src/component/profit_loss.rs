@@ -51,10 +51,14 @@ impl Component for ProfitLoss {
         }
     }
 
-    fn changed(&mut self, ctx: &Context<Self>, _props: &Self::Properties) -> bool {
-        log!("ProfitLoss::changed::should_update");
-        ctx.link().send_message(Msg::UpdateProfitLoss);
-        true
+    fn changed(&mut self, ctx: &Context<Self>, props: &Self::Properties) -> bool {
+        log!(format!("props.update: {}", props.update));
+        if props.update {
+            ctx.link().send_message(Msg::UpdateProfitLoss);
+            true
+        } else {
+            false
+        }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
