@@ -89,7 +89,6 @@ impl Component for TransactionList {
                 true
             },
             Msg::GetTransactionsComplete(transactions) => {
-                info!(format!("Got transactions: {:?}", transactions));
                 self.transactions = transactions;
                 // Send callback to profit_loss component to update profit_loss
                 ctx.props().update.emit(true);
@@ -177,6 +176,25 @@ impl TransactionList {
         };
 
         let id = transaction.id.clone();
+
+        fn format_with_commas(n: i64) -> String {
+            let is_negative = n < 0;
+            let mut s = n.abs().to_string();
+            let mut pos = s.len() as isize - 3;
+            
+            while pos > 0 {
+                s.insert(pos as usize, ',');
+                pos -= 3;
+            }
+            
+            if is_negative {
+                s = format!("({})", s);
+            }
+            
+            s
+        }
+
+        let formatted_total_price = format_with_commas(transaction.total_price);
     
         html! {
             <tr>
@@ -195,7 +213,7 @@ impl TransactionList {
                 }</td>
                 <td>{ &transaction.item_name }</td>
                 <td>{ transaction.quantity }</td>
-                <td>{ transaction.total_price }</td>
+                <td>{ formatted_total_price }</td>
                 <td> {
                     if transaction.is_purchase {
                         "Purchase"

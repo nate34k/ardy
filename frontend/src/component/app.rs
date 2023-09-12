@@ -1,14 +1,13 @@
 use crate::component::*;
 use gloo::console::log;
-use yew::{prelude::*, platform::time::sleep};
+use yew::prelude::*;
 
 pub struct App {
-    should_update_profit_loss: bool,
+    profit_loss_update_counter: i64,
 }
 
 pub enum Msg {
     UpdateProfitLoss(bool),
-    ResetUpdateProfitLoss,
 }
 
 impl Component for App {
@@ -17,33 +16,19 @@ impl Component for App {
 
     fn create(_ctx: &Context<Self>) -> Self {
         Self {
-            should_update_profit_loss: true,
+            profit_loss_update_counter: 0,
         }
     }
 
-    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::UpdateProfitLoss(should_update) => {
-                log!(format!("update: {}", should_update));
+                log!(format!("should_update in fn update(): {}", should_update));
 
                 // Update profit loss
-                self.should_update_profit_loss = should_update;
-
-                log!(format!("should_update_profit_loss: {}", self.should_update_profit_loss));
-
-                // Reset update after 1 second
-                ctx.link().send_future(async {
-                    let duration = std::time::Duration::from_secs(1);
-                    sleep(duration).await;
-                    Msg::ResetUpdateProfitLoss
-                });
-
-                true
-            },
-            Msg::ResetUpdateProfitLoss => {
-                self.should_update_profit_loss = false;
-
-                log!(format!("should_update_profit_loss: {}", self.should_update_profit_loss));
+                if should_update {
+                    self.profit_loss_update_counter += 1;
+                }
 
                 true
             },
@@ -55,7 +40,12 @@ impl Component for App {
             <main>
                 // Account for transaction list props
                 <transaction_list::TransactionList update={ctx.link().callback(|should_update| Msg::UpdateProfitLoss(should_update))} />
-                <profit_loss::ProfitLoss update={self.should_update_profit_loss}/>
+                <profit_loss::ProfitLoss update_counter={
+                    {
+                        log!(format!("should_update_profit_loss in fn view(): {}", self.profit_loss_update_counter));
+                    }
+                    self.profit_loss_update_counter
+                }/>
                 <add_transaction_overlay::AddTransactionOverlay />
             </main>
         }
