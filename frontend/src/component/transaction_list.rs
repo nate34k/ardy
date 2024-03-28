@@ -148,7 +148,8 @@ impl Component for TransactionList {
                                 <th>{ "Quantity" }</th>
                                 <th>{ "Price" }</th>
                                 <th>{ "Sale or Purchase" }</th>
-                                <th style="border-top-right-radius:10px">{ "Date" }</th>
+                                <th>{ "Date" }</th>
+                                <th style="border-top-right-radius:10px">{ "Actions" }</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -198,19 +199,7 @@ impl TransactionList {
     
         html! {
             <tr>
-                <td style={ last_row_style_left }> { 
-                    //Button for sending DELETE request to backend
-
-                    html! {
-                        <>
-                            <button class="material-icons" onclick={ctx.link().callback(move |_| Msg::DeleteTransaction(id))}> {
-                                "delete"
-                            }
-                            </button>
-                            <span>{ &transaction.id }</span>
-                        </>
-                    }
-                }</td>
+                <td style={ last_row_style_left }> { &transaction.id }</td>
                 <td>{ &transaction.item_name }</td>
                 <td>{ transaction.quantity }</td>
                 <td>{ formatted_total_price }</td>
@@ -221,7 +210,17 @@ impl TransactionList {
                         "Sale"
                     }
                 }</td>
-                <td style={ last_row_style_right }>{ &transaction.timestamp }</td>
+                <td>{ &transaction.timestamp }</td>
+                <td style={ last_row_style_right }>{ 
+                    html! {
+                        <>
+                            <button class="material-icons" onclick={ctx.link().callback(move |_| Msg::DeleteTransaction(id))}> {
+                                "delete"
+                            }
+                            </button>
+                        </>
+                    }
+                 }</td>
             </tr>
         }
     }
