@@ -43,9 +43,14 @@ pub enum Msg {
     UpdateTimestamp(String),
 }
 
+#[derive(PartialEq, Properties, Clone)]
+pub struct Props {
+    pub update: Callback<bool>,
+}
+
 impl Component for AddTransactionOverlay {
     type Message = Msg;
-    type Properties = ();
+    type Properties = Props;
 
     fn create(_ctx: &Context<Self>) -> Self {
         Self {

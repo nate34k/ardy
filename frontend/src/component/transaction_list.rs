@@ -29,6 +29,7 @@ pub enum Msg {
 #[derive(PartialEq, Properties, Clone)]
 pub struct Props {
     pub update: Callback<bool>,
+    pub update_counter: i64,
 }
 
 impl Component for TransactionList {
@@ -56,6 +57,11 @@ impl Component for TransactionList {
             transactions: Vec::new(),
             item_name: String::new(),
         }
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
+        ctx.link().send_message(Msg::Search);
+        true
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
