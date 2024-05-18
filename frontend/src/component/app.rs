@@ -5,11 +5,13 @@ use yew::prelude::*;
 pub struct App {
     profit_loss_update_counter: i64,
     transaction_list_update_counter: i64,
+    search_string: String,
 }
 
 pub enum Msg {
     UpdateProfitLoss(bool),
     UpdateTransactionList(bool),
+    UpdateTransactionListSearch(String),
 }
 
 impl Component for App {
@@ -20,6 +22,7 @@ impl Component for App {
         Self {
             profit_loss_update_counter: 0,
             transaction_list_update_counter: 0,
+            search_string: String::new(),
         }
     }
 
@@ -45,20 +48,28 @@ impl Component for App {
 
                 true
             },
+            Msg::UpdateTransactionListSearch(item_name) => {
+                log!(format!("item_name in fn update(): {}", item_name));
+
+                // Update search string
+                self.search_string = item_name;
+
+                true
+            }
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
             <main>
+                <search_bar::SearchBar on_search={ctx.link().callback(|search_string| Msg::UpdateTransactionListSearch(search_string))} />
                 // Account for transaction list props
-                <transaction_list::TransactionList update={ctx.link().callback(|should_update| Msg::UpdateProfitLoss(should_update))} update_counter={
+                <transaction_list::TransactionList search_string={
                     {
-                        log!(format!("should_update_transaction_list in fn view(): {}", self.transaction_list_update_counter));
+                        log!(format!("search_string in fn view(): {}", self.search_string));
                     }
-                    self.transaction_list_update_counter
-                
-                }/>
+                    self.search_string.clone()
+                } />
                 <profit_loss::ProfitLoss update_counter={
                     {
                         log!(format!("should_update_profit_loss in fn view(): {}", self.profit_loss_update_counter));

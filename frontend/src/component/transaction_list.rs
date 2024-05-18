@@ -28,8 +28,7 @@ pub enum Msg {
 
 #[derive(PartialEq, Properties, Clone)]
 pub struct Props {
-    pub update: Callback<bool>,
-    pub update_counter: i64,
+    pub search_string: String,
 }
 
 impl Component for TransactionList {
@@ -60,6 +59,7 @@ impl Component for TransactionList {
     }
 
     fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
+        self.item_name = ctx.props().search_string.clone();
         ctx.link().send_message(Msg::Search);
         true
     }
@@ -97,7 +97,6 @@ impl Component for TransactionList {
             Msg::GetTransactionsComplete(transactions) => {
                 self.transactions = transactions;
                 // Send callback to profit_loss component to update profit_loss
-                ctx.props().update.emit(true);
                 true
             },
             Msg::DeleteTransaction(id) => {
@@ -128,22 +127,6 @@ impl Component for TransactionList {
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
             <>
-                <div class="search-bar">
-                    <input
-                        type="text"
-                        placeholder="Enter item name"
-                        value={self.item_name.clone()}
-                        oninput = {
-                            ctx.link().callback(|e: InputEvent| {
-                                let input: HtmlInputElement = e.target_unchecked_into();
-                                Msg::UpdateItemName(input.value())
-                            })
-                        }
-                    />
-                    <button onclick={ctx.link().callback(|_| Msg::Search)}>
-                        {"Search"}
-                    </button>
-                </div>
                 <div>
                     <h1>{ "Transactions" }</h1>
                     <table class="transaction-list-table">
