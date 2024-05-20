@@ -1,5 +1,6 @@
 use actix_web::{post, get, web, HttpResponse, Responder, Error, delete};
 use rusqlite::{Connection, Result};
+use uuid::Uuid;
 
 use crate::models::{ItemData, Hello};
 
@@ -77,15 +78,17 @@ pub struct QueryParams {
 // Takes optional query parameters: item_name
 #[get("/api/v1/trade")]
 pub async fn trade_get(query_params: web::Query<QueryParams>) -> Result<impl Responder, Error> {
-    println!("GET request received");
+    let unique_request_id = uuid::Uuid::new_v4();
+
+    println!("GET request received... unique request id: {:?}", unique_request_id);
 
     let conn = Connection::open("db/ardy.db").map_err(|e| {
         println!("Failed to open database: {}", e);
         HttpResponse::InternalServerError().body("Failed to open database")
     });
 
-    let sql_query = if query_params.item_name.is_some() {
-        format!("SELECT trades.id, items.name, trades.quantity, trades.total_price, trades.is_purchase, trades.timestamp FROM trades INNER JOIN items ON trades.item_id = items.id WHERE items.name = '{}'", query_params.item_name.as_ref().unwrap())
+    let sql_query = if let Some(item_name) = &query_params.item_name {
+        format!("SELECT trades.id, items.name, trades.quantity, trades.total_price, trades.is_purchase, trades.timestamp FROM trades INNER JOIN items ON trades.item_id = items.id WHERE items.name LIKE '%{}%'", item_name)
     } else {
         "SELECT trades.id, items.name, trades.quantity, trades.total_price, trades.is_purchase, trades.timestamp FROM trades INNER JOIN items ON trades.item_id = items.id".to_string()
     };
@@ -125,6 +128,8 @@ pub async fn trade_get(query_params: web::Query<QueryParams>) -> Result<impl Res
         item_data_vec.push(row.unwrap());
     }
 
+    println!("successfully fetched trade data for unique request id: {:?}", unique_request_id);
+
     Ok(HttpResponse::Ok().json(item_data_vec))
 }
 
@@ -136,7 +141,7 @@ pub struct DeleteQueryParams {
 
 #[delete("/api/v1/trade")]
 pub async fn trade_delete(query_params: web::Query<DeleteQueryParams>) -> Result<impl Responder, Error> {
-    println!("DELETE request received");
+    println!("DELETE request received for id: {:?}", query_params.id);
 
     let conn = Connection::open("db/ardy.db").map_err(|e| {
         println!("Failed to open database: {}", e);
@@ -151,6 +156,8 @@ pub async fn trade_delete(query_params: web::Query<DeleteQueryParams>) -> Result
         HttpResponse::InternalServerError().body("Failed to delete trade data from trades table")
     }).unwrap();
 
+    println!("Trade data successfully deleted");
+
     Ok(HttpResponse::Ok().body("Trade data successfully deleted"))
 }
 
@@ -161,6 +168,7 @@ struct ProfitLossData {
 // Handle GET request for profit/loss calculation
 #[get("/api/v1/profit_loss")]
 pub async fn profit_loss_get() -> Result<impl Responder, Error> {
+    println!("GET request received for profit/loss calculation");
     // Open database conn
     let conn = Connection::open("db/ardy.db").map_err(|e| {
         println!("Failed to open database: {}", e);
@@ -196,6 +204,7 @@ pub async fn profit_loss_get() -> Result<impl Responder, Error> {
         profit_loss_vec.push(row.unwrap().profit_loss);
     }
 
+    println!("profit_loss: {:?}", profit_loss_vec.iter().sum::<i64>());
     // Return Sum of all prices
     Ok(HttpResponse::Ok().json(profit_loss_vec.iter().sum::<i64>()))
 }

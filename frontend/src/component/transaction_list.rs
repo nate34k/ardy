@@ -1,12 +1,16 @@
 use gloo::console::info;
+use gloo::console::log;
 use reqwasm::http::Request;
 use serde::{Serialize, Deserialize};
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
 
+use self::_Props::should_update;
+
 pub struct TransactionList {
     transactions: Vec<Transaction>,
     item_name: String,
+    should_update: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -29,6 +33,8 @@ pub enum Msg {
 #[derive(PartialEq, Properties, Clone)]
 pub struct Props {
     pub search_string: String,
+    pub should_update: i64,
+    pub on_update: Callback<bool>,
 }
 
 impl Component for TransactionList {
@@ -37,7 +43,7 @@ impl Component for TransactionList {
 
     fn create(ctx: &Context<Self>) -> Self {
         ctx.link().send_future(async {
-            let resp = Request::get("http://localhost:5000/api/v1/trade")
+            let resp = Request::get("http://localhost:43211/api/v1/trade")
                 .send()
                 .await;
 
@@ -55,12 +61,17 @@ impl Component for TransactionList {
         Self { 
             transactions: Vec::new(),
             item_name: String::new(),
+            should_update: false,
         }
     }
 
-    fn changed(&mut self, ctx: &Context<Self>, _old_props: &Self::Properties) -> bool {
+    fn changed(&mut self, ctx: &Context<Self>, old_props: &Self::Properties) -> bool {
+        log!(format!("props.update: {}", old_props.should_update));
         self.item_name = ctx.props().search_string.clone();
         ctx.link().send_message(Msg::Search);
+        if ctx.props().should_update != old_props.should_update {
+            self.should_update = true;
+        }
         true
     }
 
@@ -74,7 +85,7 @@ impl Component for TransactionList {
                 let item_name = self.item_name.clone();
                 // Send request to backend
                 ctx.link().send_future(async move {
-                    let mut url = String::from("http://localhost:5000/api/v1/trade");
+                    let mut url = String::from("http://localhost:43211/api/v1/trade");
                     if !item_name.is_empty() {
                         url.push_str(&format!("?item_name={}", item_name));
                     }
@@ -97,12 +108,16 @@ impl Component for TransactionList {
             Msg::GetTransactionsComplete(transactions) => {
                 self.transactions = transactions;
                 // Send callback to profit_loss component to update profit_loss
+                if self.should_update {
+                    ctx.props().on_update.emit(true);
+                }
+                self.should_update = false;
                 true
             },
             Msg::DeleteTransaction(id) => {
                 // Send DELETE request to backend
                 ctx.link().send_future(async move {
-                    let url = format!("http://localhost:5000/api/v1/trade?id={}", id);
+                    let url = format!("http://localhost:43211/api/v1/trade?id={}", id);
                     let resp = Request::delete(&url)
                         .send()
                         .await;
@@ -116,6 +131,9 @@ impl Component for TransactionList {
                         },
                     }
                 });
+
+                // Emit callback to profit_loss component to update profit_loss
+                ctx.props().on_update.emit(true);
                 
                 true
             },

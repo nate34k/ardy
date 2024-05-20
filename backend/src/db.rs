@@ -3,6 +3,8 @@ use rusqlite::{Connection, Result};
 pub fn init_db() -> Result<()> {
     let conn = Connection::open("db/ardy.db")?;
 
+    println!("Creating tables");
+
     conn.execute(
         "CREATE TABLE IF NOT EXISTS items (
             id INTEGER PRIMARY KEY NOT NULL,

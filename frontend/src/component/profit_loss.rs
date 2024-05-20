@@ -29,7 +29,7 @@ impl Component for ProfitLoss {
         log!(format!("ctx.props().update_counter: {}", ctx.props().update_counter));
 
         ctx.link().send_future(async {
-            let resp = Request::get("http://localhost:5000/api/v1/profit_loss")
+            let resp = Request::get("http://localhost:43211/api/v1/profit_loss")
                 .send()
                 .await;
 
@@ -67,11 +67,12 @@ impl Component for ProfitLoss {
                 true
             },
             Msg::UpdateProfitLoss => {
+                log!("Waiting 50ms before updating profit/loss");
                 log!("Updating profit/loss");
                 self.state.component_ready = false;
 
                 ctx.link().send_future(async {
-                    let resp = Request::get("http://localhost:5000/api/v1/profit_loss")
+                    let resp = Request::get("http://localhost:43211/api/v1/profit_loss")
                         .send()
                         .await;
 

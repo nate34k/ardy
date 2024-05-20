@@ -44,6 +44,7 @@ impl Component for App {
                 // Update transaction list
                 if should_update {
                     self.transaction_list_update_counter += 1;
+                    self.profit_loss_update_counter += 1;
                 }
 
                 true
@@ -62,14 +63,21 @@ impl Component for App {
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
             <main>
+                // Search bar
                 <search_bar::SearchBar on_search={ctx.link().callback(|search_string| Msg::UpdateTransactionListSearch(search_string))} />
+
                 // Account for transaction list props
-                <transaction_list::TransactionList search_string={
+                <transaction_list::TransactionList should_update={
+                    {
+                        log!(format!("should_update_transaction_list in fn view(): {}", self.transaction_list_update_counter));
+                    }
+                    self.transaction_list_update_counter
+                } search_string={
                     {
                         log!(format!("search_string in fn view(): {}", self.search_string));
                     }
                     self.search_string.clone()
-                } />
+                } on_update={ctx.link().callback(|should_update| Msg::UpdateProfitLoss(should_update))} />
                 <profit_loss::ProfitLoss update_counter={
                     {
                         log!(format!("should_update_profit_loss in fn view(): {}", self.profit_loss_update_counter));

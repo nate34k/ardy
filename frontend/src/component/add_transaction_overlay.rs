@@ -133,7 +133,7 @@ impl Component for AddTransactionOverlay {
                 // Send the trade to the backend
                 ctx.link().send_future(async {
                     info!(format!("Sending trade: {}", trade_json));
-                    let resp = Request::post("http://localhost:5000/api/v1/trade")
+                    let resp = Request::post("http://localhost:43211/api/v1/trade")
                         .header("Content-Type", "application/json")
                         .body(trade_json)
                         .send()
@@ -153,6 +153,10 @@ impl Component for AddTransactionOverlay {
                         }
                     }
                 });
+
+                // Emit
+                ctx.props().update.emit(true);
+
                 true
             }
             Msg::SubmitTradeSuccess => {
