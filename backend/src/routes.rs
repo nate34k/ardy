@@ -1,8 +1,8 @@
-use actix_web::{post, get, web, HttpResponse, Responder, Error, delete};
+use actix_web::{delete, get, post, web, Error, HttpResponse, Responder};
 use rusqlite::{Connection, Result};
 use uuid::Uuid;
 
-use crate::models::{ItemData, Hello};
+use crate::models::{Hello, ItemData};
 
 // Handle GET request
 #[get("/api/v1/hello")]
@@ -24,7 +24,9 @@ pub async fn hello_post(web::Json(hello_data): web::Json<Hello>) -> impl Respond
 
 // Handle Post request for adding trade data to database
 #[post("/api/v1/trade")]
-pub async fn trade_post(web::Json(item_data): web::Json<ItemData>) -> Result<impl Responder, Error> {
+pub async fn trade_post(
+    web::Json(item_data): web::Json<ItemData>,
+) -> Result<impl Responder, Error> {
     println!("POST request received");
 
     let conn = Connection::open("db/ardy.db").map_err(|e| {
@@ -33,22 +35,31 @@ pub async fn trade_post(web::Json(item_data): web::Json<ItemData>) -> Result<imp
     });
 
     // Insert item_name into items table and get its id
-    conn.as_ref().unwrap().execute(
-        "INSERT OR IGNORE INTO items (name) VALUES (?1)",
-        &[&item_data.item_name],
-    ).map_err(|e| {
-        println!("Failed to insert item name into items table: {}", e);
-        HttpResponse::InternalServerError().body("Failed to insert item name into items table")
-    }).unwrap();
+    conn.as_ref()
+        .unwrap()
+        .execute(
+            "INSERT OR IGNORE INTO items (name) VALUES (?1)",
+            &[&item_data.item_name],
+        )
+        .map_err(|e| {
+            println!("Failed to insert item name into items table: {}", e);
+            HttpResponse::InternalServerError().body("Failed to insert item name into items table")
+        })
+        .unwrap();
 
-    let item_id: i64 = conn.as_ref().unwrap().query_row(
-        "SELECT id FROM items WHERE name = ?1",
-        &[&item_data.item_name],
-        |row| row.get(0),
-    ).map_err(|e| {
-        println!("Failed to get item id from items table: {}", e);
-        HttpResponse::InternalServerError().body("Failed to get item id from items table")
-    }).unwrap();
+    let item_id: i64 = conn
+        .as_ref()
+        .unwrap()
+        .query_row(
+            "SELECT id FROM items WHERE name = ?1",
+            &[&item_data.item_name],
+            |row| row.get(0),
+        )
+        .map_err(|e| {
+            println!("Failed to get item id from items table: {}", e);
+            HttpResponse::InternalServerError().body("Failed to get item id from items table")
+        })
+        .unwrap();
 
     // Convert boolean to i64 (0 or 1)
     let is_purchase_i64 = if item_data.is_purchase { 1 } else { 0 };
@@ -80,7 +91,10 @@ pub struct QueryParams {
 pub async fn trade_get(query_params: web::Query<QueryParams>) -> Result<impl Responder, Error> {
     let unique_request_id = uuid::Uuid::new_v4();
 
-    println!("GET request received... unique request id: {:?}", unique_request_id);
+    println!(
+        "GET request received... unique request id: {:?}",
+        unique_request_id
+    );
 
     let conn = Connection::open("db/ardy.db").map_err(|e| {
         println!("Failed to open database: {}", e);
@@ -93,16 +107,18 @@ pub async fn trade_get(query_params: web::Query<QueryParams>) -> Result<impl Res
         "SELECT trades.id, items.name, trades.quantity, trades.total_price, trades.is_purchase, trades.timestamp FROM trades INNER JOIN items ON trades.item_id = items.id".to_string()
     };
 
-    let mut stmt = conn.as_ref().unwrap().prepare(
-        &sql_query,
-    ).map_err(|e| {
-        println!("Failed to prepare statement: {}", e);
-        HttpResponse::InternalServerError().body("Failed to prepare statement")
-    }).unwrap();
+    let mut stmt = conn
+        .as_ref()
+        .unwrap()
+        .prepare(&sql_query)
+        .map_err(|e| {
+            println!("Failed to prepare statement: {}", e);
+            HttpResponse::InternalServerError().body("Failed to prepare statement")
+        })
+        .unwrap();
 
-    let rows = stmt.query_map(
-        [],
-        |row| {
+    let rows = stmt
+        .query_map([], |row| {
             Ok(ItemData {
                 id: row.get(0)?,
                 item_name: row.get(1)?,
@@ -112,15 +128,17 @@ pub async fn trade_get(query_params: web::Query<QueryParams>) -> Result<impl Res
                 timestamp: {
                     let timestamp: String = row.get(5)?;
                     let timestamp: i64 = timestamp.parse().unwrap();
-                    let naive_datetime = chrono::NaiveDateTime::from_timestamp_opt(timestamp, 0).unwrap();
+                    let naive_datetime =
+                        chrono::NaiveDateTime::from_timestamp_opt(timestamp, 0).unwrap();
                     naive_datetime
                 },
             })
-        },
-    ).map_err(|e| {
-        println!("Failed to query map: {}", e);
-        HttpResponse::InternalServerError().body("Failed to query map")
-    }).unwrap();
+        })
+        .map_err(|e| {
+            println!("Failed to query map: {}", e);
+            HttpResponse::InternalServerError().body("Failed to query map")
+        })
+        .unwrap();
 
     let mut item_data_vec = Vec::new();
 
@@ -128,7 +146,10 @@ pub async fn trade_get(query_params: web::Query<QueryParams>) -> Result<impl Res
         item_data_vec.push(row.unwrap());
     }
 
-    println!("successfully fetched trade data for unique request id: {:?}", unique_request_id);
+    println!(
+        "successfully fetched trade data for unique request id: {:?}",
+        unique_request_id
+    );
 
     Ok(HttpResponse::Ok().json(item_data_vec))
 }
@@ -140,7 +161,9 @@ pub struct DeleteQueryParams {
 }
 
 #[delete("/api/v1/trade")]
-pub async fn trade_delete(query_params: web::Query<DeleteQueryParams>) -> Result<impl Responder, Error> {
+pub async fn trade_delete(
+    query_params: web::Query<DeleteQueryParams>,
+) -> Result<impl Responder, Error> {
     println!("DELETE request received for id: {:?}", query_params.id);
 
     let conn = Connection::open("db/ardy.db").map_err(|e| {
@@ -148,13 +171,14 @@ pub async fn trade_delete(query_params: web::Query<DeleteQueryParams>) -> Result
         HttpResponse::InternalServerError().body("Failed to open database")
     });
 
-    conn.unwrap().execute(
-        "DELETE FROM trades WHERE id = ?1",
-        &[&query_params.id],
-    ).map_err(|e| {
-        println!("Failed to delete trade data from trades table: {}", e);
-        HttpResponse::InternalServerError().body("Failed to delete trade data from trades table")
-    }).unwrap();
+    conn.unwrap()
+        .execute("DELETE FROM trades WHERE id = ?1", &[&query_params.id])
+        .map_err(|e| {
+            println!("Failed to delete trade data from trades table: {}", e);
+            HttpResponse::InternalServerError()
+                .body("Failed to delete trade data from trades table")
+        })
+        .unwrap();
 
     println!("Trade data successfully deleted");
 
@@ -184,19 +208,17 @@ pub async fn profit_loss_get() -> Result<impl Responder, Error> {
         HttpResponse::InternalServerError().body("Failed to prepare statement")
     }).unwrap();
 
-    let rows = stmt.query_map(
-        [],
-        |row| {
-            Ok(
-                ProfitLossData {
-                    profit_loss: row.get(0)?,
-                }
-            )
-        },
-    ).map_err(|e| {
-        println!("Failed to query map: {}", e);
-        HttpResponse::InternalServerError().body("Failed to query map")
-    }).unwrap();
+    let rows = stmt
+        .query_map([], |row| {
+            Ok(ProfitLossData {
+                profit_loss: row.get(0)?,
+            })
+        })
+        .map_err(|e| {
+            println!("Failed to query map: {}", e);
+            HttpResponse::InternalServerError().body("Failed to query map")
+        })
+        .unwrap();
 
     let mut profit_loss_vec = Vec::new();
 

@@ -1,9 +1,9 @@
-mod routes;
-mod models;
 mod db;
+mod models;
+mod routes;
 
-use actix_web::{App, HttpServer};
 use actix_cors::Cors;
+use actix_web::{App, HttpServer};
 use routes::*;
 
 #[actix_web::main]

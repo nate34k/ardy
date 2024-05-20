@@ -4,6 +4,7 @@ use reqwasm::http::Request;
 use serde::{Serialize, Deserialize};
 use web_sys::HtmlInputElement;
 use yew::prelude::*;
+use yew::virtual_dom::VNode;
 
 use self::_Props::should_update;
 
@@ -34,7 +35,7 @@ pub enum Msg {
 pub struct Props {
     pub search_string: String,
     pub should_update: i64,
-    pub on_update: Callback<bool>,
+    pub update: Callback<bool>,
 }
 
 impl Component for TransactionList {
@@ -103,15 +104,18 @@ impl Component for TransactionList {
                         },
                     }
                 });
+
                 true
             },
             Msg::GetTransactionsComplete(transactions) => {
                 self.transactions = transactions;
-                // Send callback to profit_loss component to update profit_loss
+
                 if self.should_update {
-                    ctx.props().on_update.emit(true);
+                    ctx.props().update.emit(self.should_update);
                 }
-                self.should_update = false;
+
+                self.should_update  = false;
+
                 true
             },
             Msg::DeleteTransaction(id) => {
@@ -132,8 +136,7 @@ impl Component for TransactionList {
                     }
                 });
 
-                // Emit callback to profit_loss component to update profit_loss
-                ctx.props().on_update.emit(true);
+                self.should_update = true;
                 
                 true
             },
@@ -145,24 +148,25 @@ impl Component for TransactionList {
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
             <>
-                <div>
-                    <h1>{ "Transactions" }</h1>
-                    <table class="transaction-list-table">
-                        <thead>
-                            <tr>
-                                <th style="border-top-left-radius:10px">{ "ID" }</th>
-                                <th>{ "Name" }</th>
-                                <th>{ "Quantity" }</th>
-                                <th>{ "Price" }</th>
-                                <th>{ "Sale or Purchase" }</th>
-                                <th>{ "Date" }</th>
-                                <th style="border-top-right-radius:10px">{ "Actions" }</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            { for self.transactions.iter().enumerate().map(|(index, transaction)| self.render_row(ctx, index, transaction)) }
-                        </tbody>
-                    </table>
+                <div class="transaction-panel">
+                    <div class="transaction-list-container">
+                        <table class="transaction-list-table">
+                            <thead>
+                                <tr>
+                                    <th style="border-top-left-radius:10px">{ "ID" }</th>
+                                    <th>{ "Name" }</th>
+                                    <th>{ "Quantity" }</th>
+                                    <th>{ "Price" }</th>
+                                    <th>{ "Sale or Purchase" }</th>
+                                    <th>{ "Date" }</th>
+                                    <th style="border-top-right-radius:10px">{ "Actions" }</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                { self.transactions.iter().enumerate().map(|(index, transaction)| self.render_row(ctx, index, transaction)).collect::<Vec<VNode>>() }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </>
         }
