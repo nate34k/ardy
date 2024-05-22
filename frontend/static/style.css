@@ -235,10 +235,12 @@ button[type="submit"] {
 .transaction-list-container {
     max-height: 70vh;
     overflow-y: auto;
+    /* This is the magic bit for Firefox */
+    scrollbar-width: none;
     border: 2px solid transparent;
     border-radius: 12px;
     margin-top: 5vh;
-    transition: border .3 ease;
+    transition: all 0.3s ease;
 }
 
 .transaction-list-container:hover {

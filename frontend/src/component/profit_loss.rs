@@ -112,7 +112,7 @@ impl Component for ProfitLoss {
         }
         
         // Conditionally render the profit/loss amount based on whether it's ready or not.
-        let formatted_profit_loss = if self.state.component_ready {
+        let formatted_profit_loss = {
             // Assuming self.state.profit_loss is i64 or similar type.
             let color = if self.state.profit_loss >= 0 { "#a6da95" } else { "#ed8796" };
             
@@ -125,10 +125,6 @@ impl Component for ProfitLoss {
                 <div class="rounded-div" style={format!("background-color: {};", color)}>
                     { formatted_string }
                 </div>
-            }
-        } else {
-            html! {
-                <h1>{ "Loading..." }</h1>
             }
         };
         
