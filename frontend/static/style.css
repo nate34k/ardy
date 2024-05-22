@@ -103,7 +103,7 @@ button:hover {
     min-width: 300px;
     max-width: 900px;
     padding: 10px;
-    background-color: #1e1e1e;
+    background-color: #1e2030;
     border-radius: 12px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     box-sizing: border-box; /* include padding in total width and height */
@@ -136,7 +136,7 @@ button:hover {
     width: 100%;
     border-radius: 12px;
     margin: 3px;
-    background-color: #252525;
+    background-color: #24273a;
 }
 
 .label-input-container label {
@@ -144,24 +144,22 @@ button:hover {
     font-size: 16px;
     font-weight: 600;
     text-transform: uppercase;
-    color: #d4d4d4;
+    color: #cad3f5;
     letter-spacing: 0.05em;
     transition: color 0.3s ease;
 }
 
 /* Default styles */
 .label-input-container input {
-    border: 2px solid #ccc;
-    background-color: #5c5c5c;
-    color: #d4d4d4;
-    transition: border-color 0.3s ease;
+    border: 2px solid transparent;
+    background-color: #494d64;
+    color: #cad3f5;
+    transition: border 0.3s ease;
 }
 
 /* Styles when focused */
 .label-input-container input:focus {
-    border-color: #007bff;
-    background-color: #6c787e;
-    color: #d4d4d4;
+    border: 2px solid #c6a0f6;
     outline: none;
 }
 
@@ -180,7 +178,7 @@ button:hover {
 
 .label-input-container input:focus + label,
 .label-input-container select:focus + label {
-    color: #007bff;
+    color: #c6a0f6;
 }
 
 .radio-button-container {
@@ -189,6 +187,17 @@ button:hover {
     justify-content: flex-start;
     align-items: center;
     width: 50%;
+    outline: none;
+}
+
+input[type="radio"] {
+    appearance: none;
+    transition: all 0.3s ease;
+}
+
+input[type="radio"]:checked {
+    background-color: #c6a0f6;
+    border: 2px solid #c6a0f6;
 }
 
 .radio-button-container label {
@@ -215,36 +224,16 @@ button:hover {
     width: 100%;
     padding: 10px;
     margin-top: 20px;
-    border-radius: 3px;
-    border: none;
-    background-color: #0056b3;
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.close-button:hover {
-    background-color: #004080;
 }
 
 button[type="submit"] {
     width: 100%;
     padding: 10px;
     margin-top: 20px;
-    border-radius: 3px;
-    border: none;
-    background-color: #0056b3;
-    color: #fff;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-button[type="submit"]:hover {
-    background-color: #004080;
 }
 
 .transaction-list-container {
-    max-height: 60vh;
+    max-height: 70vh;
     overflow-y: auto;
     border: 2px solid transparent;
     border-radius: 12px;
