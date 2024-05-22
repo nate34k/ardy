@@ -93,6 +93,7 @@ impl Component for ProfitLoss {
     }
 
     fn view(&self, _ctx: &Context<Self>) -> Html {
+        // Helper function to format the number with commas.
         fn format_with_commas(n: i64) -> String {
             let is_negative = n < 0;
             let mut s = n.abs().to_string();
@@ -110,10 +111,10 @@ impl Component for ProfitLoss {
             s
         }
         
-
+        // Conditionally render the profit/loss amount based on whether it's ready or not.
         let formatted_profit_loss = if self.state.component_ready {
             // Assuming self.state.profit_loss is i64 or similar type.
-            let color = if self.state.profit_loss >= 0 { "green" } else { "red" };
+            let color = if self.state.profit_loss >= 0 { "#a6da95" } else { "#ed8796" };
             
             // Using the helper function to format the number with commas.
             let formatted_number = format_with_commas(self.state.profit_loss);
@@ -121,18 +122,22 @@ impl Component for ProfitLoss {
             let formatted_string = format!("{} gp", formatted_number);
             
             html! {
-                <h1 style={format!("color: {};", color)}>{ formatted_string }</h1>
+                <div class="rounded-div" style={format!("background-color: {};", color)}>
+                    { formatted_string }
+                </div>
             }
         } else {
             html! {
                 <h1>{ "Loading..." }</h1>
             }
         };
-    
+        
+        // Main component view.
         html! {
-            <div class="profit-loss">
-                { formatted_profit_loss }
-            </div>
+            <>
+            <div class="profit-loss">{ formatted_profit_loss }</div>
+            </>
         }
-    }    
+}
+
 }
