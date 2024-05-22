@@ -1,7 +1,7 @@
 # ardy
 
 ## Warnings
-Application is currently being developed and breaking changes are to be expected.
+Application is currently being developed and breaking changes are to be expected. This is a project I created mostly to learn rust web development, do not expect this to be a hardened webapp.
 
 ## Usage
 Build backend with cargo r, run frontend with trunk serve (optionally add --open to open browser window)
