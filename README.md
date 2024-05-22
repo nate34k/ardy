@@ -1,5 +1,8 @@
 # ardy
 
+## Warnings
+Application is currently being developed and breaking changes are to be expected.
+
 ## Usage
 Build backend with cargo r, run frontend with trunk serve (optionally add --open to open browser window)
 
