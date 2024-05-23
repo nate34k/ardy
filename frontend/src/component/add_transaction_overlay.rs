@@ -193,22 +193,30 @@ impl AddTransactionOverlay {
     }
 
     fn construct_overlay_html(&self, ctx: &Context<Self>) -> Html {
-        if self.state.show_overlay {
-            html! {
-                <div class="overlay-container">
-                    <div class="overlay"> {
-                        self.construct_overlay_header_html(&ctx)
-                    } {
-                        self.construct_overlay_body_html(&ctx)
-                    } 
-                    if let SubmitStatus::Success = self.state.submit_status {
-                        { self.construct_success_fail_msg_html(&ctx) }
-                    }
-                    </div>
-                </div>
-            }
+        let overlay_class = if self.state.show_overlay {
+            "overlay"
         } else {
-            html! {}
+            "overlay hide"
+        };
+
+        let overlay_container_class = if self.state.show_overlay {
+            "overlay-container"
+        } else {
+            "overlay-container hide"
+        };
+    
+        html! {
+            <div class={overlay_container_class}>
+                <div class={overlay_class}> {
+                    self.construct_overlay_header_html(&ctx)
+                } {
+                    self.construct_overlay_body_html(&ctx)
+                } 
+                if let SubmitStatus::Success = self.state.submit_status {
+                    { self.construct_success_fail_msg_html(&ctx) }
+                }
+                </div>
+            </div>
         }
     }
 
