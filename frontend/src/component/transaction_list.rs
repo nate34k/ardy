@@ -175,14 +175,8 @@ impl Component for TransactionList {
 
 impl TransactionList {
     fn render_row(&self, ctx: &Context<Self>, index: usize, transaction: &Transaction) -> Html {
-        let last_row_style_left = if index == self.transactions.len() - 1 {
-            "border-bottom-left-radius:10px"
-        } else {
-            ""
-        };
-
-        let last_row_style_right = if index == self.transactions.len() - 1 {
-            "border-bottom-right-radius:10px"
+        let last_row_style = if index == self.transactions.len() - 1 {
+            "border-bottom:0px"
         } else {
             ""
         };
@@ -210,19 +204,19 @@ impl TransactionList {
     
         html! {
             <tr>
-                <td style={ last_row_style_left }> { &transaction.id }</td>
-                <td>{ &transaction.item_name }</td>
-                <td>{ transaction.quantity }</td>
-                <td>{ formatted_total_price }</td>
-                <td> {
+                <td style={ last_row_style }> { &transaction.id }</td>
+                <td style={ last_row_style }> { &transaction.item_name }</td>
+                <td style={ last_row_style }> { transaction.quantity }</td>
+                <td style={ last_row_style }> { formatted_total_price }</td>
+                <td style={ last_row_style }> {
                     if transaction.is_purchase {
                         "Purchase"
                     } else {
                         "Sale"
                     }
                 }</td>
-                <td>{ &transaction.timestamp }</td>
-                <td style={ last_row_style_right }>{ 
+                <td style={ last_row_style }> { &transaction.timestamp }</td>
+                <td style={ last_row_style }> { 
                     html! {
                         <>
                             <button class="material-icons" onclick={ctx.link().callback(move |_| Msg::DeleteTransaction(id))}> {

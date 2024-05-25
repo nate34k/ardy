@@ -1,7 +1,17 @@
+/* Catpuccin Machiatto Colors */
+:root {
+    --mauve: #c6a0f6;
+    --red: #ed8796;
+    --green: #a6da95;
+    --blue: #8aadf4;
+    --text: #cad3f5;
+    --base: #24273a;
+}
+
 body {
     font-family: Arial, sans-serif;
-    background-color: #24273a;
-    color: #cad3f5;
+    background-color: var(--base);
+    color: var(--text);
     margin: 0;
 }
 
@@ -38,12 +48,7 @@ div {
     position: relative;
 }
 
-/* Styling for the search bar and its components for better alignment */
-.search-bar {
-    margin-top: 15px;
-}
-
-.search-bar label {
+.input-box label {
     font-family: 'Roboto', sans-serif;
     font-size: 16px;
     font-weight: 600;
@@ -54,20 +59,22 @@ div {
 }
 
 /* Default styles */
-.search-bar input {
+.input-box input {
     border: 2px solid transparent;
     background-color: #494d64;
     color: #cad3f5;
     transition: all 0.3s ease;
 }
 
-.search-bar input:hover {
-    border: 2px solid rgb(147, 154, 183)
+.input-box input:hover {
+    border: 2px solid rgb(147, 154, 183);
+    box-shadow: 0 0 4px rgb(147, 154, 183);
 }
 
 /* Styles when focused */
-.search-bar input:focus {
-    border: 2px solid #c6a0f6;
+.input-box input:focus {
+    border: 2px solid var(--mauve);
+    box-shadow: 0 0 8px var(--mauve);
     outline: none;
 }
 
@@ -81,11 +88,12 @@ input, button {
 }
 
 button {
-    background-color: #8aadf4;
+    border: 2px solid transparent;
+    background-color: var(--blue);
     color: #363a4f;
     font-weight: bold;
     cursor: pointer;
-    transition: opacity 0.3s;
+    transition: all 0.3s;
 }
 
 #add-transaction-button {
@@ -96,7 +104,9 @@ button {
 }
 
 button:hover {
-    opacity: 70%;
+    background-color: var(--mauve);
+    border: 2px solid var(--mauve);
+    box-shadow: 0 0 8px var(--mauve);
 }
 
 .overlay-container {
@@ -191,12 +201,14 @@ button:hover {
 }
 
 .label-input-container input:hover {
-    border: 2px solid rgb(147, 154, 183)
+    border: 2px solid rgb(147, 154, 183);
+    box-shadow: 0 0 4px rgb(147, 154, 183);
 }
 
 /* Styles when focused */
 .label-input-container input:focus {
-    border: 2px solid #c6a0f6;
+    border: 2px solid var(--mauve);
+    box-shadow: 0 0 8px var(--mauve);
     outline: none;
 }
 
@@ -215,7 +227,7 @@ button:hover {
 
 .label-input-container input:focus + label,
 .label-input-container select:focus + label {
-    color: #c6a0f6;
+    color: var(--mauve);
 }
 
 .radio-button-container {
@@ -233,13 +245,18 @@ input[type="radio"] {
 }
 
 input[type="radio"]:checked {
-    background-color: #c6a0f6;
-    border: 2px solid #c6a0f6;
+    background-color: var(--mauve);
+    border: 2px solid var(--mauve);
 }
 
 .radio-button-container label {
     margin-left: 5px;
     font-size: 14px;
+}
+
+#timestamp {
+    font-size: 14px;
+    width: 70%;
 }
 
 .overlay-label, .overlay-input {
@@ -281,7 +298,7 @@ button[type="submit"] {
 }
 
 .transaction-list-container:hover {
-    border: 2px solid #c6a0f6;
+    border: 2px solid var(--mauve);
 }
 
 /* Updated CSS snippet */
