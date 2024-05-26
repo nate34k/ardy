@@ -48,6 +48,16 @@ div {
     position: relative;
 }
 
+.input-box {
+    display: flex;
+    width: 18rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+    position: relative;
+}
+
 .input-box label {
     font-family: 'Roboto', sans-serif;
     font-size: 16px;
@@ -60,10 +70,34 @@ div {
 
 /* Default styles */
 .input-box input {
+    position: relative;
     border: 2px solid transparent;
     background-color: #494d64;
     color: #cad3f5;
     transition: all 0.3s ease;
+}
+
+.input-box::before,
+.input-box::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    background: linear-gradient(45deg, var(--blue), var(--mauve));
+    filter: blur(1.5rem);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    z-index: -1;
+}
+
+.input-box:hover::before,
+.input-box:hover::after {
+    opacity: 0.25;
+}
+
+.input-box:focus-within::before,
+.input-box:focus-within::after {
+    opacity: 0.5;
 }
 
 .input-box input:hover {
