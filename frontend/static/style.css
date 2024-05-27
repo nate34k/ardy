@@ -17,6 +17,7 @@
     --text: #cad3f5;
     --subtext-1: #b8c0e0;
     --subtext-0: #a5adcb;
+    --surface-0: #363a4f;
     --base: #24273a;
     --mantle: #1e2030;
     --crust: #181926;
@@ -85,12 +86,14 @@ div {
 
 .input-box input {
     position: relative;
-    /* border: 2px solid transparent; */
-    background-color: #494d64;
+    /* border: 1px solid transparent; */
+    background-color: var(--surface-0);
     color: var(--text);
     transition: all 0.3s ease;
-    width: 98%;
-    box-sizing: border-box; /* include padding and border in the element's total width and height */
+    width: 92%;
+    height: 100%;
+    border-radius: 10px;
+    /* box-sizing: border-box; */
 }
 
 @property --gradient-angle {
@@ -108,7 +111,7 @@ div {
 .input-box::after {
     content: '';
     position: absolute;
-    inset: -2px;
+    inset: -0.10rem;
     border-radius: inherit;
     background: conic-gradient(
         from var(--gradient-angle),
@@ -116,10 +119,13 @@ div {
         var(--sapphire),
         var(--mauve));
     opacity: 0;
-    filter: blur(5px);
     animation: rotation 20s linear infinite;
     transition: opacity 0.3s ease;
     z-index: -1;
+}
+
+.input-box::after {
+    filter: blur(2.5rem);
 }
 
 .input-box:hover::before,
@@ -132,12 +138,7 @@ div {
     opacity: 1;
 }
 
-.input-box input:hover {
-    /* border: 2px solid rgb(147, 154, 183); */
-}
-
 .input-box input:focus {
-    /* border: 2px solid var(--mauve); */
     outline: none;
 }
 
@@ -349,19 +350,47 @@ button[type="submit"] {
     margin-top: 20px;
 }
 
+.transaction-panel {
+    position: relative;
+    margin-top: 5vh;
+    border-radius: 12px;
+}
+
+.transaction-panel::before,
+.transaction-panel::after {
+    content: '';
+    position: absolute;
+    inset: -.25rem;
+    border-radius: inherit;
+    background: conic-gradient(
+        from var(--gradient-angle),
+        var(--mauve),
+        var(--blue),
+        var(--sapphire),
+        var(--blue),
+        var(--mauve));
+    opacity: 0;
+    animation: rotation 20s linear infinite;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.transaction-panel::after {
+    filter: blur(3.5rem);
+}
+
+.transaction-panel:hover::before,
+.transaction-panel:hover::after {
+    opacity: 0.5;
+}
+
 .transaction-list-container {
     max-height: 70vh;
     overflow-y: auto;
-    /* This is the magic bit for Firefox */
     scrollbar-width: none;
-    border: 2px solid transparent;
     border-radius: 12px;
-    margin-top: 5vh;
     transition: all 0.3s ease;
-}
-
-.transaction-list-container:hover {
-    border: 2px solid var(--mauve);
+    background-color: var(--mantle);
 }
 
 /* Updated CSS snippet */
@@ -377,7 +406,7 @@ button[type="submit"] {
 }
 
 .transaction-list-table thead tr th {
-    background-color: #494d64;
+    background-color: var(--surface-0);
     text-align: center;
     padding: 15px;
     top: 0;
@@ -398,6 +427,12 @@ button[type="submit"] {
     border-bottom: 1px solid #5c5c5c;
     text-align: center;
     padding: 15px;
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+
+.transaction-list-table tbody tr:hover td {
+    background-color: rgba(198, 160, 246, 0.4);
 }
 
 .alert-card {
