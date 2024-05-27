@@ -1,11 +1,25 @@
 /* Catpuccin Machiatto Colors */
 :root {
+    --rosewater: #f4dbd6;
+    --flamingo: #f0c6c6;
+    --pink: #f5bde6;
     --mauve: #c6a0f6;
     --red: #ed8796;
+    --maroon: #ee99a0;
+    --peach: #f5a97f;
+    --yellow: #eed49f;
     --green: #a6da95;
+    --teal: #8bd5ca;
+    --sky: #91d7e3;
+    --sapphire: #7dc4e4;
     --blue: #8aadf4;
+    --lavender: #b7bdf8;
     --text: #cad3f5;
+    --subtext-1: #b8c0e0;
+    --subtext-0: #a5adcb;
     --base: #24273a;
+    --mantle: #1e2030;
+    --crust: #181926;
 }
 
 body {
@@ -68,7 +82,6 @@ div {
     transition: color 0.3s ease;
 }
 
-/* Default styles */
 .input-box input {
     position: relative;
     border: 2px solid transparent;
@@ -77,14 +90,32 @@ div {
     transition: all 0.3s ease;
 }
 
+@property --gradient-angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+}
+
+@keyframes rotation {
+    0% { --gradient-angle: 0deg; }
+    100% { --gradient-angle: 360deg; }
+}
+
 .input-box::before,
 .input-box::after {
     content: '';
     position: absolute;
-    inset: 0;
-    border-radius: 12px;
-    background: linear-gradient(45deg, var(--blue), var(--mauve));
+    inset: -1rem;
+    border-radius: inherit;
+    background: conic-gradient(
+        from var(--gradient-angle),
+        var(--maroon),
+        var(--blue),
+        var(--sapphire),
+        var(--blue),
+        var(--maroon));
     filter: blur(1.5rem);
+    animation: rotation 20s linear infinite;
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
     z-index: -1;
@@ -102,13 +133,10 @@ div {
 
 .input-box input:hover {
     border: 2px solid rgb(147, 154, 183);
-    box-shadow: 0 0 4px rgb(147, 154, 183);
 }
 
-/* Styles when focused */
 .input-box input:focus {
     border: 2px solid var(--mauve);
-    box-shadow: 0 0 8px var(--mauve);
     outline: none;
 }
 

@@ -1,0 +1,2 @@
+[serve]
+static-dir = "static"
