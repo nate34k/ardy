@@ -65,6 +65,7 @@ div {
 .input-box {
     display: flex;
     width: 18rem;
+    height: 2.65rem;
     flex-direction: column;
     justify-content: center;
     align-items: center;
@@ -77,17 +78,19 @@ div {
     font-size: 16px;
     font-weight: 600;
     text-transform: uppercase;
-    color: #cad3f5;
+    color: var(--text);
     letter-spacing: 0.05em;
     transition: color 0.3s ease;
 }
 
 .input-box input {
     position: relative;
-    border: 2px solid transparent;
+    /* border: 2px solid transparent; */
     background-color: #494d64;
-    color: #cad3f5;
+    color: var(--text);
     transition: all 0.3s ease;
+    width: 98%;
+    box-sizing: border-box; /* include padding and border in the element's total width and height */
 }
 
 @property --gradient-angle {
@@ -105,45 +108,43 @@ div {
 .input-box::after {
     content: '';
     position: absolute;
-    inset: -1rem;
+    inset: -2px;
     border-radius: inherit;
     background: conic-gradient(
         from var(--gradient-angle),
-        var(--maroon),
-        var(--blue),
+        var(--mauve),
         var(--sapphire),
-        var(--blue),
-        var(--maroon));
-    filter: blur(1.5rem);
-    animation: rotation 20s linear infinite;
+        var(--mauve));
     opacity: 0;
-    transition: opacity 0.3s ease-in-out;
+    filter: blur(5px);
+    animation: rotation 20s linear infinite;
+    transition: opacity 0.3s ease;
     z-index: -1;
 }
 
 .input-box:hover::before,
 .input-box:hover::after {
-    opacity: 0.25;
+    opacity: 0.5;
 }
 
 .input-box:focus-within::before,
 .input-box:focus-within::after {
-    opacity: 0.5;
+    opacity: 1;
 }
 
 .input-box input:hover {
-    border: 2px solid rgb(147, 154, 183);
+    /* border: 2px solid rgb(147, 154, 183); */
 }
 
 .input-box input:focus {
-    border: 2px solid var(--mauve);
+    /* border: 2px solid var(--mauve); */
     outline: none;
 }
 
 input, button {
     padding: 10px;
     border: none;
-    border-radius: 5px;
+    border-radius: 12px;
     margin: 5px;
     font-size: 16px;
 
