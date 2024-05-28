@@ -18,8 +18,10 @@
     --subtext-1: #b8c0e0;
     --subtext-0: #a5adcb;
     --surface-0: #363a4f;
+    --surface-0-trans: rgba(54, 58, 79, 0.8);
     --base: #24273a;
     --mantle: #1e2030;
+    --mantle-trans: rgba(30, 32, 48, 0.85);
     --crust: #181926;
 }
 
@@ -64,14 +66,16 @@ div {
 }
 
 .input-box {
+    margin-block: 1rem;
     display: flex;
     width: 18rem;
     height: 2.65rem;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border-radius: 12px;
+    border-radius: 8px;
     position: relative;
+    background-color: var(--surface-0);
 }
 
 .input-box label {
@@ -87,10 +91,10 @@ div {
 .input-box input {
     position: relative;
     /* border: 1px solid transparent; */
-    background-color: var(--surface-0);
+    background-color: transparent;
     color: var(--text);
     transition: all 0.3s ease;
-    width: 92%;
+    width: 90%;
     height: 100%;
     border-radius: 10px;
     /* box-sizing: border-box; */
@@ -111,8 +115,8 @@ div {
 .input-box::after {
     content: '';
     position: absolute;
-    inset: -0.10rem;
-    border-radius: inherit;
+    inset: -0.2rem;
+    border-radius: 10px;
     background: conic-gradient(
         from var(--gradient-angle),
         var(--mauve),
@@ -353,15 +357,15 @@ button[type="submit"] {
 .transaction-panel {
     position: relative;
     margin-top: 5vh;
-    border-radius: 12px;
+    border-radius: 8px;
 }
 
 .transaction-panel::before,
 .transaction-panel::after {
     content: '';
     position: absolute;
-    inset: -.25rem;
-    border-radius: inherit;
+    inset: -.2rem;
+    border-radius: 10px;
     background: conic-gradient(
         from var(--gradient-angle),
         var(--mauve),
@@ -388,9 +392,10 @@ button[type="submit"] {
     max-height: 70vh;
     overflow-y: auto;
     scrollbar-width: none;
-    border-radius: 12px;
+    border-radius: 8px;
     transition: all 0.3s ease;
-    background-color: var(--mantle);
+    background-color: var(--mantle-trans);
+    backdrop-filter: blur(1rem);
 }
 
 /* Updated CSS snippet */

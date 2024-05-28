@@ -153,13 +153,13 @@ impl Component for TransactionList {
                         <table class="transaction-list-table">
                             <thead>
                                 <tr>
-                                    <th style="border-top-left-radius:10px">{ "ID" }</th>
+                                    <th style="border-top-left-radius:8px">{ "ID" }</th>
                                     <th>{ "Name" }</th>
                                     <th>{ "Quantity" }</th>
                                     <th>{ "Price" }</th>
                                     <th>{ "Sale or Purchase" }</th>
                                     <th>{ "Date" }</th>
-                                    <th style="border-top-right-radius:10px">{ "Actions" }</th>
+                                    <th style="border-top-right-radius:8px">{ "Actions" }</th>
                                 </tr>
                             </thead>
                             <tbody>
