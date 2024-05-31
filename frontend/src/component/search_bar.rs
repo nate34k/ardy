@@ -29,7 +29,7 @@ impl Component for SearchBar {
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            // Update the item name used for searching, but wait 750ms before searching after no more
+            // Update the item name used for searching, but wait 600ms before searching after no more
             Msg::UpdateItemName(name) => {
                 self.item_name = name;
 
@@ -51,7 +51,7 @@ impl Component for SearchBar {
                     .unwrap()
                     .set_timeout_with_callback_and_timeout_and_arguments_0(
                         callback.as_ref().unchecked_ref(),
-                        400,
+                        600,
                     )
                     .expect("Failed to set timeout");
 
