@@ -64,12 +64,22 @@ impl Component for SearchBar {
             Msg::Search => {
                 let item_name = self.item_name.clone();
                 ctx.props().on_search.emit(item_name);
+                
+                // Clear the timeout ID
+                self.timeout_id = None;
+
                 true
             },
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
+        let loader_class = if self.timeout_id.is_some() {
+            "input-loader"
+        } else {
+            "input-loader hide"
+        };
+
         html! {
             <div class="input-box">
                 <input
@@ -83,6 +93,7 @@ impl Component for SearchBar {
                         })
                     }
                 />
+                <div class={loader_class}></div>
             </div>
         }
     }

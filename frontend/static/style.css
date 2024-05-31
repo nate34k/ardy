@@ -46,6 +46,15 @@ div {
     align-items: center;
 }
 
+input, button {
+    padding: 10px;
+    border: none;
+    border-radius: 12px;
+    margin: 5px;
+    font-size: 16px;
+
+}
+
 @keyframes breathing {
     0% { opacity: 1; }
     50% { opacity: 0.2; }
@@ -70,12 +79,12 @@ div {
     display: flex;
     width: 18rem;
     height: 2.65rem;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     border-radius: 8px;
     position: relative;
     background-color: var(--surface-0);
+    flex-direction: row;
 }
 
 .input-box label {
@@ -90,14 +99,68 @@ div {
 
 .input-box input {
     position: relative;
-    /* border: 1px solid transparent; */
     background-color: transparent;
+    flex-grow: 1;
     color: var(--text);
     transition: all 0.3s ease;
-    width: 90%;
     height: 100%;
     border-radius: 10px;
-    /* box-sizing: border-box; */
+    margin: 0;
+    margin-left: 0.5rem;
+    padding: 0;
+}
+
+.input-loader {
+    width: 1.5rem;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    margin-right: 0.8rem;
+    position: relative;
+    opacity: 1;
+    transition: all 0.6s ease;
+}
+
+.input-loader.hide {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.input-loader::before,
+.input-loader::after {
+    content: '';
+    position: absolute;/* Border color of the spinner */
+    border-radius: 50%;
+    background-image: linear-gradient(
+        var(--mauve),
+        var(--sky)
+    );
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 1.5em;
+    height: 1.5em;
+    box-sizing: border-box;
+    animation: animate-input-loader 1s linear infinite;
+}
+
+.input-loader::after {
+    filter: blur(0.5rem);
+}
+
+@keyframes animate-input-loader {
+    0% {
+        transform: rotate(0deg);
+        opacity: 1;
+    }
+    50% {
+        transform: rotate(180deg);
+        opacity: 0.3;
+    }
+    100% {
+        transform: rotate(360deg);
+        opacity: 1;
+    }
 }
 
 @property --gradient-angle {
@@ -144,15 +207,6 @@ div {
 
 .input-box input:focus {
     outline: none;
-}
-
-input, button {
-    padding: 10px;
-    border: none;
-    border-radius: 12px;
-    margin: 5px;
-    font-size: 16px;
-
 }
 
 button {
