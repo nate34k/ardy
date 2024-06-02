@@ -4,11 +4,13 @@ use yew::prelude::*;
 pub struct SearchBar {
     item_name: String,
     timeout_id: Option<i32>,
+    show_loader: bool,
 }
 
 pub enum Msg {
     UpdateItemName(String),
     Search,
+    Reset,
 }
 
 #[derive(PartialEq, Properties, Clone)]
@@ -24,7 +26,13 @@ impl Component for SearchBar {
         Self {
             item_name: String::new(),
             timeout_id: None,
+            show_loader: false,
         }
+    }
+
+    fn changed(&mut self, ctx: &Context<Self>, old_props: &Self::Properties) -> bool {
+        // ctx.link().send_message(Msg::Reset);
+        false
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -64,17 +72,39 @@ impl Component for SearchBar {
             Msg::Search => {
                 let item_name = self.item_name.clone();
                 ctx.props().on_search.emit(item_name);
-                
+                self.show_loader = true;
+
                 // Clear the timeout ID
                 self.timeout_id = None;
 
+                // Set a minimum display time for the loader
+                let link = ctx.link().clone();
+                let callback = Closure::wrap(Box::new(move || {
+                    link.send_message(Msg::Reset);
+                }) as Box<dyn Fn()>);
+
+                let timeout_id = window()
+                    .unwrap()
+                    .set_timeout_with_callback_and_timeout_and_arguments_0(
+                        callback.as_ref().unchecked_ref(),
+                        600, // Set this to the duration of your animation
+                    )
+                    .expect("Failed to set timeout");
+
+                self.timeout_id = Some(timeout_id);
+                callback.forget();
+
+                true
+            },
+            Msg::Reset => {
+                self.show_loader = false;
                 true
             },
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let loader_class = if self.timeout_id.is_some() {
+        let loader_class = if self.show_loader {
             "input-loader"
         } else {
             "input-loader hide"
@@ -93,7 +123,8 @@ impl Component for SearchBar {
                         })
                     }
                 />
-                <div class={loader_class}></div>
+                <div class={loader_class}>
+                </div>
             </div>
         }
     }

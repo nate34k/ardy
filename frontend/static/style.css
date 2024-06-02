@@ -111,7 +111,7 @@ input, button {
 }
 
 .input-loader {
-    width: 1.5rem;
+    width: 2rem;
     height: auto;
     aspect-ratio: 1 / 1;
     margin-right: 0.8rem;
@@ -130,7 +130,7 @@ input, button {
     content: '';
     position: absolute;/* Border color of the spinner */
     border-radius: 50%;
-    background-image: linear-gradient(
+    background-image: conic-gradient(
         var(--mauve),
         var(--sky)
     );
@@ -138,8 +138,8 @@ input, button {
     left: 0;
     right: 0;
     bottom: 0;
-    width: 1.5em;
-    height: 1.5em;
+    width: 2em;
+    height: 2em;
     box-sizing: border-box;
     animation: animate-input-loader 1s linear infinite;
 }
@@ -152,10 +152,6 @@ input, button {
     0% {
         transform: rotate(0deg);
         opacity: 1;
-    }
-    50% {
-        transform: rotate(180deg);
-        opacity: 0.3;
     }
     100% {
         transform: rotate(360deg);
