@@ -84,13 +84,19 @@ impl Component for App {
                                 log!(format!("search_string in fn view(): {}", self.search_string));
                             }
                             self.search_string.clone()
-                        } update={ctx.link().callback(|should_update| Msg::UpdateProfitLoss(should_update))} />
+                        } update={
+                            ctx.link().callback(|should_update| Msg::UpdateProfitLoss(should_update))
+                        }/>
+
+
                         <profit_loss::ProfitLoss update_counter={
                             {
                                 log!(format!("should_update_profit_loss in fn view(): {}", self.profit_loss_update_counter));
                             }
                             self.profit_loss_update_counter
                         }/>
+
+
                         <add_transaction_overlay::AddTransactionOverlay update={ctx.link().callback(|should_update| Msg::UpdateTransactionList(should_update))} />
                     </main>
                 </div>
