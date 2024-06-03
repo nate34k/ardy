@@ -5,6 +5,7 @@ use yew::prelude::*;
 pub struct App {
     profit_loss_update_counter: i64,
     transaction_list_update_counter: i64,
+    search_bar_update_counter: i64,
     search_string: String,
 }
 
@@ -12,6 +13,7 @@ pub enum Msg {
     UpdateProfitLoss(bool),
     UpdateTransactionList(bool),
     UpdateTransactionListSearch(String),
+    UpdateSearchBar(bool),
 }
 
 impl Component for App {
@@ -22,12 +24,23 @@ impl Component for App {
         Self {
             profit_loss_update_counter: 0,
             transaction_list_update_counter: 0,
+            search_bar_update_counter: 0,
             search_string: String::new(),
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
+            Msg::UpdateSearchBar(should_update) => {
+                log!(format!("should_update in fn update(): {}", should_update));
+
+                // Update search bar
+                if should_update {
+                    self.search_bar_update_counter += 1;
+                }
+
+                true
+            },
             Msg::UpdateProfitLoss(should_update) => {
                 log!(format!("should_update in fn update(): {}", should_update));
 
@@ -55,6 +68,9 @@ impl Component for App {
                 // Update search string
                 self.search_string = item_name;
 
+                // Increment transaction list update counter
+                self.transaction_list_update_counter += 1;
+
                 true
             }
         }
@@ -71,6 +87,8 @@ impl Component for App {
                         <search_bar::SearchBar
                             on_search={
                                 ctx.link().callback(|search_string| Msg::UpdateTransactionListSearch(search_string))
+                            } turn_off_loader={
+                                self.search_bar_update_counter   
                             }/>
 
                         // Account for transaction list props
@@ -86,6 +104,8 @@ impl Component for App {
                             self.search_string.clone()
                         } update={
                             ctx.link().callback(|should_update| Msg::UpdateProfitLoss(should_update))
+                        } turn_off_loader={
+                            ctx.link().callback(|should_update| Msg::UpdateSearchBar(should_update))   
                         }/>
 
 
