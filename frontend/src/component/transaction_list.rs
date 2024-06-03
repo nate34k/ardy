@@ -1,12 +1,8 @@
-use gloo::console::info;
 use gloo::console::log;
 use reqwasm::http::Request;
 use serde::{Serialize, Deserialize};
-use web_sys::HtmlInputElement;
 use yew::prelude::*;
 use yew::virtual_dom::VNode;
-
-use self::_Props::should_update;
 
 pub struct TransactionList {
     transactions: Vec<Transaction>,
@@ -25,7 +21,6 @@ pub struct Transaction {
 }
 
 pub enum Msg {
-    UpdateItemName(String),
     Search,
     GetTransactionsComplete(Vec<Transaction>),
     DeleteTransaction(i64),
@@ -36,6 +31,7 @@ pub struct Props {
     pub search_string: String,
     pub should_update: i64,
     pub update: Callback<bool>,
+    pub turn_off_loader: Callback<bool>,
 }
 
 impl Component for TransactionList {
@@ -73,17 +69,18 @@ impl Component for TransactionList {
         if ctx.props().should_update != old_props.should_update {
             self.should_update = true;
         }
+        if ctx.props().search_string != old_props.search_string {
+            self.should_update = true;
+        }
+
         true
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Msg::UpdateItemName(name) => {
-                self.item_name = name;
-                false
-            },
             Msg::Search => {
                 let item_name = self.item_name.clone();
+                
                 // Send request to backend
                 ctx.link().send_future(async move {
                     let mut url = String::from("http://localhost:43211/api/v1/trade");
@@ -112,9 +109,10 @@ impl Component for TransactionList {
 
                 if self.should_update {
                     ctx.props().update.emit(self.should_update);
+                    ctx.props().turn_off_loader.emit(true);
                 }
 
-                self.should_update  = false;
+                self.should_update = false;
 
                 true
             },

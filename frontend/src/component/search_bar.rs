@@ -1,5 +1,6 @@
 use web_sys::{wasm_bindgen::{closure::Closure, JsCast}, window, HtmlInputElement};
 use yew::prelude::*;
+use gloo::console::log;
 
 pub struct SearchBar {
     item_name: String,
@@ -11,11 +12,13 @@ pub enum Msg {
     UpdateItemName(String),
     Search,
     Reset,
+    HideLoader,
 }
 
 #[derive(PartialEq, Properties, Clone)]
 pub struct Props {
     pub on_search: Callback<String>,
+    pub turn_off_loader: i64,
 }
 
 impl Component for SearchBar {
@@ -31,8 +34,12 @@ impl Component for SearchBar {
     }
 
     fn changed(&mut self, ctx: &Context<Self>, old_props: &Self::Properties) -> bool {
-        // ctx.link().send_message(Msg::Reset);
-        false
+        log!("Changed");
+        log!(format!("Old: {}, New: {}", old_props.turn_off_loader, ctx.props().turn_off_loader));
+        if old_props.turn_off_loader != ctx.props().turn_off_loader {
+            ctx.link().send_message(Msg::Reset);
+        }
+        true
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -77,17 +84,20 @@ impl Component for SearchBar {
                 // Clear the timeout ID
                 self.timeout_id = None;
 
-                // Set a minimum display time for the loader
+                true
+            },
+            Msg::Reset => {
+                // Set show_loader to false after the loader has been displayed for 600ms
                 let link = ctx.link().clone();
                 let callback = Closure::wrap(Box::new(move || {
-                    link.send_message(Msg::Reset);
+                    link.send_message(Msg::HideLoader);
                 }) as Box<dyn Fn()>);
 
                 let timeout_id = window()
                     .unwrap()
                     .set_timeout_with_callback_and_timeout_and_arguments_0(
                         callback.as_ref().unchecked_ref(),
-                        600, // Set this to the duration of your animation
+                        500, // Set this to the duration of your animation
                     )
                     .expect("Failed to set timeout");
 
@@ -96,7 +106,7 @@ impl Component for SearchBar {
 
                 true
             },
-            Msg::Reset => {
+            Msg::HideLoader => {
                 self.show_loader = false;
                 true
             },
